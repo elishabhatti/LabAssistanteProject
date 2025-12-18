@@ -1,7 +1,6 @@
 ﻿@{
     Layout = null;
     var requests = (List<LabAssistanteProject.Models.Requests>)ViewBag.Requests;
-    var facilities = (List<LabAssistanteProject.Models.Facilities>)ViewBag.Facilities;
 }
 
 <!DOCTYPE html>
@@ -9,18 +8,19 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Portal | LabAssistant</title>
+    <title>My Requests | LabAssistant</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
     <style>
         :root {
             --primary: #4361ee;
+            --primary-soft: rgba(67, 97, 238, 0.1);
             --sidebar-bg: #ffffff;
             --bg-main: #f8f9fc;
             --border: #edf2f7;
-            --dark: #011627;
+            --dark: #1e293b;
         }
 
         body {
@@ -44,9 +44,11 @@
             color: #64748b;
             font-weight: 500;
             padding: 0.8rem 1rem;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 0.5rem;
             transition: 0.3s;
+            display: flex;
+            align-items: center;
         }
 
             .nav-link:hover {
@@ -63,58 +65,65 @@
         /* Main Content */
         .content {
             margin-left: 280px;
-            padding: 2rem;
+            padding: 2.5rem;
         }
 
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
-        /* Card Styling */
+        /* Table & Card Styling */
         .card {
             border: none;
-            border-radius: 16px;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            background: white;
         }
 
-        .form-label {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #475569;
-        }
-
-        .form-control, .form-select {
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            padding: 0.6rem 1rem;
-        }
-
-        /* Table Styling */
         .table thead th {
-            background: #f8f9fa;
+            background: #f8fafc;
             text-transform: uppercase;
-            font-size: 0.7rem;
-            letter-spacing: 0.05em;
-            color: #64748b;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            color: #94a3b8;
+            padding: 1.2rem 1rem;
             border: none;
         }
 
         .table td {
-            padding: 1rem;
+            padding: 1.2rem 1rem;
             vertical-align: middle;
             border-top: 1px solid var(--border);
         }
 
-        .status-pill {
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.75rem;
-            display: inline-flex;
-            align-items: center;
+        /* Status & Badge Styling */
+        .badge-severity {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .remarks-box {
+            background: #f1f5f9;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: #475569;
+            border-left: 4px solid var(--primary);
         }
     </style>
 </head>
@@ -122,21 +131,21 @@
 
     <div class="sidebar d-flex flex-column">
         <div class="d-flex align-items-center mb-5 px-2">
-            <div class="bg-primary text-white p-2 rounded-3 me-2">
+            <div class="bg-primary text-white p-2 rounded-3 me-2 shadow-sm">
                 <i class="bi bi-cpu-fill"></i>
             </div>
             <h4 class="m-0 fw-bold">LabAssist</h4>
         </div>
 
         <nav class="nav flex-column flex-grow-1">
-            <a class="nav-link active" href="#"><i class="bi bi-plus-circle me-2"></i> New Request</a>
-            <a class="nav-link" href="#history"><i class="bi bi-clock-history me-2"></i> My Requests</a>
-            <a class="nav-link" href="@Url.Action("Help", "Pages")"><i class="bi bi-question-circle me-2"></i> Help Center</a>
+            <a class="nav-link" href="/Roles/EndUser"><i class="bi bi-plus-circle me-2"></i> Create Request</a>
+            <a class="nav-link active" href="#"><i class="bi bi-clock-history me-2"></i> My Requests</a>
+            <a class="nav-link" href="/Pages/Help"><i class="bi bi-question-circle me-2"></i> Help Center</a>
         </nav>
 
         <div class="mt-auto">
             <form asp-controller="Auth" asp-action="Logout" method="post">
-                <button class="btn btn-outline-danger w-100 rounded-3 border-0 fw-bold">
+                <button class="btn btn-light text-danger w-100 rounded-3 fw-bold shadow-sm">
                     <i class="bi bi-box-arrow-left me-2"></i> Logout
                 </button>
             </form>
@@ -147,128 +156,122 @@
 
         <div class="header-top">
             <div>
-                <h3 class="fw-bold m-0">Welcome back, @ViewBag.username!</h3>
-                <p class="text-muted small">Need help with a facility? Raise a ticket below.</p>
+                <h3 class="fw-bold m-0 text-dark">Request History 📜</h3>
+                <p class="text-muted small mb-0">Track and monitor all your service tickets</p>
             </div>
-            <div class="bg-white p-2 px-3 rounded-4 border shadow-sm">
-                <span class="small fw-bold text-primary">@ViewBag.role</span>
+            <div class="d-flex align-items-center bg-white p-2 pe-3 rounded-pill border shadow-sm">
+                <div class="bg-primary-soft text-primary rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width:35px; height:35px;">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <span class="small fw-bold">@ViewBag.username</span>
             </div>
         </div>
 
-        @if (!string.IsNullOrEmpty(ViewBag.Message))
-        {
-            <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4">
-                <i class="bi bi-check-circle me-2"></i> @ViewBag.Message
+        <div class="card">
+            <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">Recent Activity</h5>
+                <span class="badge bg-primary rounded-pill">@requests?.Count Total</span>
             </div>
-        }
 
-        <div class="row mb-5">
-            <div class="col-lg-12">
-                <div class="card p-4">
-                    <h5 class="fw-bold mb-4">Create New Service Request 📋</h5>
-                    <form asp-controller="Requests" asp-action="Create" method="post">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Select Facility</label>
-                                <select name="FacilityId" class="form-select" required>
-                                    <option value="">-- Choose Location --</option>
-                                    @foreach (var f in facilities)
-                                    {
-                                        <option value="@f.Id">@f.Name</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Severity Level</label>
-                                <select name="Severity" class="form-select" required>
-                                    <option value="Low">Low</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="High">High</option>
-                                    <option value="Critical">Critical</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Problem Description</label>
-                                <textarea name="Description" class="form-control" rows="3" placeholder="Describe the issue in detail..." required minlength="10"></textarea>
-                            </div>
-                            <div class="col-md-12 text-end">
-                                <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-3 shadow-sm">
-                                    Submit Request <i class="bi bi-send-fill ms-2"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div id="history" class="mt-5">
-            <div class="card overflow-hidden">
-                <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold"><i class="bi bi-list-task me-2 text-primary"></i>My Ticket History</h6>
-                    <span class="badge bg-light text-dark border">@requests?.Count Tickets</span>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th class="ps-4">Ticket</th>
-                                <th>Facility</th>
-                                <th>Severity</th>
-                                <th>Status</th>
-                                <th>Assigned To</th>
-                                <th>Updates/Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (requests != null && requests.Any())
-                            {
-                                foreach (var req in requests)
-                                {
-                                    <tr>
-                                        <td class="ps-4">
-                                            <span class="fw-bold text-dark">#REQ-@req.Id</span><br>
-                                            <small class="text-muted">@req.CreatedAt.ToString("MMM dd, yyyy")</small>
-                                        </td>
-                                        <td>
-                                            <div class="fw-medium">@req.Facility?.Name</div>
-                                            <div class="text-muted small text-truncate" style="max-width: 200px;">@req.Description</div>
-                                        </td>
-                                        <td>
-                                            @{
-                                                var sCol = req.Severity?.ToLower() == "critical" ? "danger" : (req.Severity?.ToLower() == "high" ? "warning" : "success");
-                                            }
-                                            <span class="badge bg-@sCol bg-opacity-10 text-@sCol border border-@sCol border-opacity-25">@req.Severity</span>
-                                        </td>
-                                        <td>
-                                            @{
-                                                var status = req.Status?.ToLower() ?? "pending";
-                                                var icon = status == "completed" ? "bi-check-circle-fill text-success" : "bi-clock-history text-primary";
-                                            }
-                                            <div class="small fw-bold d-flex align-items-center">
-                                                <i class="bi @icon me-2"></i> @(char.ToUpper(status[0]) + status.Substring(1))
-                                            </div>
-                                        </td>
-                                        <td class="small">
-                                            @(req.Assignee?.Username ?? "Waiting...")
-                                        </td>
-                                        <td>
-                                            <div class="p-2 rounded-3 bg-light border-start border-3 border-primary-subtle small">
-                                                @(req.Remarks ?? "No technician notes yet.")
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                            else
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Ticket Details</th>
+                            <th>Facility / Location</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Assigned Specialist</th>
+                            <th>Updates / Remarks</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (requests != null && requests.Any())
+                        {
+                            foreach (var req in requests)
                             {
                                 <tr>
-                                    <td colspan="6" class="text-center py-5 text-muted italic">No tickets found. Raise your first request above!</td>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-primary">#REQ-@req.Id</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">
+                                            <i class="bi bi-calendar3 me-1"></i> @req.CreatedAt.ToString("MMM dd, yyyy")
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-semibold text-dark">@req.Facility?.Name</div>
+                                        <div class="text-muted small text-truncate" style="max-width: 180px;" title="@req.Description">
+                                            @req.Description
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @{
+                                            var sClass = req.Severity?.ToLower() == "critical" ? "danger" :
+                                            (req.Severity?.ToLower() == "high" ? "warning" : "info");
+                                        }
+                                        <span class="badge-severity bg-@sClass bg-opacity-10 text-@sClass border border-@sClass border-opacity-25">
+                                            @req.Severity
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @{
+                                            var status = req.Status?.ToLower() ?? "pending";
+                                            var statusColor = status == "completed" ? "success" : (status == "in-progress" ? "warning" : "primary");
+                                        }
+                                        <div class="d-flex align-items-center fw-bold small text-@statusColor">
+                                            <span class="status-indicator bg-@statusColor"></span>
+                                            @(char.ToUpper(status[0]) + status.Substring(1))
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="small fw-medium">
+                                                @(req.Assignee?.Username ?? "Unassigned")
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="remarks-box">
+                                            <i class="bi bi-chat-right-text me-1 opacity-50"></i>
+                                            @(req.Remarks ?? "No technician notes available yet.")
+                                        </div>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        @if (req.Status?.ToLower() != "completed")
+                                        {
+                                            <div class="d-flex justify-content-end gap-2">
+                                                <a asp-controller="Requests" asp-action="EditRequest" asp-route-id="@req.Id" class="btn btn-sm btn-outline-primary border-0">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+
+                                                <form asp-controller="Requests" asp-action="Delete" asp-route-id="@req.Id"
+                                                      method="post" onsubmit="return confirm('Are you sure you want to delete this request?');">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                                        <i class="bi bi-trash3"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-light text-muted fw-normal">Locked</span>
+                                        }
+                                    </td>
                                 </tr>
                             }
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="80" class="opacity-25 mb-3"><br>
+                                    <p class="text-muted">No requests found in your history.</p>
+                                    <a href="/Requests/Create" class="btn btn-primary btn-sm rounded-pill px-4">Create First Ticket</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

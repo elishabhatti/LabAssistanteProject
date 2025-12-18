@@ -63,5 +63,67 @@ namespace LabAssistanteProject.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+        // POST: Requests/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userIdString = User.FindFirstValue("UserId");
+            if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
+
+            var request = await _context.Requests
+                .FirstOrDefaultAsync(r => r.Id == id && r.RequestorId == userId);
+
+            if (request == null) return NotFound();
+
+            // Security Check: Prevent deleting completed requests
+            if (request.Status?.ToLower() == "completed")
+            {
+                TempData["Error"] = "Completed requests cannot be deleted.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            _context.Requests.Remove(request);
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = "Request deleted successfully.";
+            return RedirectToAction("Index", "Home");
+        }
+        // GET: /Requests/EditRequest/5
+        [HttpGet]
+        public async Task<IActionResult> EditRequest(int id)
+        {
+            var request = await _context.Requests.FindAsync(id);
+
+            // Check if request exists and belongs to the user (optional but recommended)
+            if (request == null || request.Status?.ToLower() == "completed")
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            ViewBag.Facilities = await _context.Facilities.ToListAsync();
+
+            // Explicitly point to the path shown in your screenshot
+            return View("~/Views/Roles/EditRequest.cshtml", request);
+        }
+
+        // POST: /Requests/EditRequest/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditRequest(int id, [Bind("Id,FacilityId,Severity,Description")] Requests updatedReq)
+        {
+            if (id != updatedReq.Id) return NotFound();
+
+            var existing = await _context.Requests.FindAsync(id);
+            if (existing == null || existing.Status?.ToLower() == "completed") return BadRequest();
+
+            existing.FacilityId = updatedReq.FacilityId;
+            existing.Severity = updatedReq.Severity;
+            existing.Description = updatedReq.Description;
+
+            await _context.SaveChangesAsync();
+            TempData["Message"] = "Request updated successfully!";
+            return RedirectToAction("Index", "Home");
+        }
     }
 }
