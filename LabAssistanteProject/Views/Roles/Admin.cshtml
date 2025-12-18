@@ -181,20 +181,81 @@
             </div>
 
             <div class="tab-pane fade" id="facilities">
+                @if (TempData["Message"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["Message"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
                 <div class="row g-3">
-                    @foreach (var f in ViewBag.AllFacilities) {
+                    @foreach (var f in ViewBag.AllFacilities)
+                    {
                         <div class="col-md-6">
-                            <div class="card p-3 d-flex flex-row align-items-center">
-                                <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3 text-primary">
-                                    <i class="bi bi-building-fill h4 m-0"></i>
-                                </div>
-                                <div>
-                                    <h6 class="m-0 fw-bold">@f.Name</h6>
-                                    <p class="text-muted small m-0">@f.Description</p>
+                            <div class="card p-3 shadow-sm border-0 position-relative">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3 text-primary">
+                                        <i class="bi bi-building-fill h4 m-0"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="m-0 fw-bold">@f.Name</h6>
+                                        <p class="text-muted small m-0">@f.Description</p>
+                                    </div>
+
+                                    <div class="dropdown">
+                                        <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical fs-5"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                            <li>
+                                                <button class="dropdown-item" onclick="openEditModal(@f.Id, '@f.Name', '@f.Description')">
+                                                    <i class="bi bi-pencil me-2 text-primary"></i> Edit Lab
+                                                </button>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form asp-action="DeleteFacility" method="post" onsubmit="return confirm('Warning: Deleting this lab might affect associated requests. Proceed?')">
+                                                    <input type="hidden" name="id" value="@f.Id" />
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="bi bi-trash me-2"></i> Delete Lab
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     }
+                </div>
+            </div>
+
+            <div class="modal fade" id="editFacilityModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow">
+                        <form asp-action="UpdateFacility" method="post">
+                            <div class="modal-header bg-primary text-white border-0 rounded-top">
+                                <h5 class="modal-title fw-bold">Update Lab Details</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <input type="hidden" name="id" id="editId" />
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-uppercase">Facility Name</label>
+                                    <input type="text" name="name" id="editName" class="form-control rounded-3" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold small text-uppercase">Description</label>
+                                    <textarea name="description" id="editDesc" class="form-control rounded-3" rows="3" required></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0 p-3">
+                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary rounded-pill px-4">Update Lab</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 
@@ -272,6 +333,16 @@
             },
             options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
         });
+                function openEditModal(id, name, desc) {
+            // Fill the hidden input and text fields in the modal
+            document.getElementById('editId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editDesc').value = desc;
+
+            // Trigger the bootstrap modal
+            var myModal = new bootstrap.Modal(document.getElementById('editFacilityModal'));
+            myModal.show();
+        }
     </script>
 </body>
 </html>

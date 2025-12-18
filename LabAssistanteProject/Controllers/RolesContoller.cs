@@ -219,6 +219,38 @@ namespace LabAssistanteProject.Controllers
 
             return View("~/Views/Roles/EndUser.cshtml");
         }
+        // --- Facility Management (Admin Only) ---
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateFacility(int id, string name, string description)
+        {
+            var facility = await _context.Facilities.FindAsync(id);
+            if (facility == null) return NotFound();
+
+            facility.Name = name;
+            facility.Description = description;
+
+            _context.Facilities.Update(facility);
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = "Facility updated successfully!";
+            return RedirectToAction("Admin");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteFacility(int id)
+        {
+            var facility = await _context.Facilities.FindAsync(id);
+            if (facility != null)
+            {
+                _context.Facilities.Remove(facility);
+                await _context.SaveChangesAsync();
+                TempData["Message"] = "Facility deleted successfully!";
+            }
+            return RedirectToAction("Admin");
+        }
 
         public IActionResult AccessDenied()
         {
