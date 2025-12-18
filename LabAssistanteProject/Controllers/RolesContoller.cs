@@ -18,7 +18,7 @@ namespace LabAssistanteProject.Controllers
         {
             _context = context;
         }
-
+        [Authorize(Roles = "facility_head")]
         [HttpGet]
         public async Task<IActionResult> FacilityHead()
         {
@@ -110,7 +110,7 @@ namespace LabAssistanteProject.Controllers
             return RedirectToAction("FacilityHead");
         }
 
-
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Admin()
         {
             ViewBag.username = User.Identity?.Name;
@@ -133,6 +133,7 @@ namespace LabAssistanteProject.Controllers
             return View("~/Views/Roles/Admin.cshtml");
         }
         // --- Assignee Dashboard (GET) ---
+        [Authorize(Roles = "assignee")]
         public async Task<IActionResult> Assignee()
         {
             ViewBag.username = User.Identity?.Name;
@@ -201,7 +202,7 @@ namespace LabAssistanteProject.Controllers
             return RedirectToAction("Assignee");
         }
 
-
+        [Authorize(Roles = "enduser")]
         public async Task<IActionResult> EndUser() // async banayein kyunke facilities fetch karni hain
         {
             // 1. User Info set karein (Claims se)

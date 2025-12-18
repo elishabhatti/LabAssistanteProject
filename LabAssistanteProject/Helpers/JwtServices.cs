@@ -20,11 +20,12 @@ namespace LabAssistanteProject.Helpers
         {
             var claims = new[]
        {
-    new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
-    new Claim("UserId", user.Id.ToString()),
-    new Claim(ClaimTypes.Name, user.Username ?? ""),
-    new Claim("email", user.Email!) // add email claim for HomeController
-};
+            new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
+            new Claim("UserId", user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Username ?? ""),
+            new Claim("email", user.Email!),
+            new Claim(ClaimTypes.Role, user.Role!),
+        };
 
 
             var keyString = _config["Jwt:Key"]
