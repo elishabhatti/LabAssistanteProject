@@ -1,11 +1,10 @@
-﻿// Controllers/RolesController.cs
-using LabAssistanteProject.Data; // MyAppContext ke liye
+﻿using LabAssistanteProject.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // Include() aur ToListAsync() ke liye
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks; // async/await ke liye
+using System.Threading.Tasks;
 
 namespace LabAssistanteProject.Controllers
 {
@@ -14,37 +13,47 @@ namespace LabAssistanteProject.Controllers
     {
         private readonly MyAppContext _context;
 
-        public RolesController(MyAppContext context) // DbContext Injection
+        public RolesController(MyAppContext context)
         {
             _context = context;
         }
-        [Authorize(Roles = "facility_head")]
+
+        // --- Helper: Redirect Logic ---
+        private IActionResult RedirectToCorrectDashboard(string currentRole)
+        {
+            return currentRole switch
+            {
+                "admin" => RedirectToAction("Admin"),
+                "facility_head" => RedirectToAction("FacilityHead"),
+                "assignee" => RedirectToAction("Assignee"),
+                "enduser" => RedirectToAction("EndUser"),
+                _ => RedirectToAction("Login", "Auth")
+            };
+        }
+
+        // --- FacilityHead Dashboard ---
         [HttpGet]
         public async Task<IActionResult> FacilityHead()
         {
-            // --- 1. Basic User Info ---
+            // Role Check
+            var role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
+            if (role != "facility_head") return RedirectToCorrectDashboard(role);
+
             ViewBag.username = User.Identity?.Name;
             ViewBag.userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.FindFirstValue("email");
             ViewBag.userId = User.FindFirstValue("UserId");
-            ViewBag.role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
-
-            // Success/Error message display
+            ViewBag.role = role;
             ViewBag.Message = TempData["Message"] as string;
 
-            // --- 2. Fetch Requests (End User created) ---
-            // Fetch all requests, including details about who created it, the facility, and the assigned user.
             var allRequests = await _context.Requests
-                .Include(r => r.Requestor) // Request banane wale ka detail (User)
-                .Include(r => r.Facility)  // Facility detail
-                .Include(r => r.Assignee)  // Assignee ka detail
+                .Include(r => r.Requestor)
+                .Include(r => r.Facility)
+                .Include(r => r.Assignee)
                 .OrderByDescending(r => r.CreatedAt)
                 .ToListAsync();
 
             ViewBag.Requests = allRequests;
-            // 
 
-            // --- 3. Fetch Assignees (Users who can resolve requests) ---
-            // Fetch users whose role is 'Assignee' or 'Technician' (as potential resolvers)
             var assignees = await _context.Users
                 .Where(u => u.Role == "Assignee" || u.Role == "Technician")
                 .OrderBy(u => u.Username)
@@ -55,48 +64,38 @@ namespace LabAssistanteProject.Controllers
             return View("~/Views/Roles/FacilityHead.cshtml");
         }
 
-        // --- Assignment Logic (POST) ---
-        // (Is logic ko hum nahi badal rahe, yeh assign karne ke liye use hoga)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Assign(int requestId, int assigneeId)
         {
-            // 1. Request dhundo (Purana status janne ke liye)
             var request = await _context.Requests.FindAsync(requestId);
-
             if (request == null)
             {
                 TempData["Message"] = "Error: Request not found.";
                 return RedirectToAction("FacilityHead");
             }
 
-            // --- 2. History ke liye purana data save karein ---
             string oldStatus = request.Status ?? "unassigned";
             string newStatus = "Work-In-Progress";
-
-            // Logged-in User (Facility Head) ki ID nikalna
             var currentUserIdStr = User.FindFirstValue("UserId");
             int currentUserId = int.TryParse(currentUserIdStr, out int id) ? id : 0;
 
-            // --- 3. Update Request ---
             request.AssigneeId = assigneeId;
             request.Status = newStatus;
 
-            // --- 4. Create History Record ---
             var historyEntry = new Models.History
             {
                 RequestId = requestId,
                 OldStatus = oldStatus,
                 NewStatus = newStatus,
-                UpdatedBy = currentUserId, // Jisne assign kiya
+                UpdatedBy = currentUserId,
                 UpdatedAt = DateTime.UtcNow
             };
 
             try
             {
                 _context.Requests.Update(request);
-                _context.History.Add(historyEntry); // History table mein insert
-
+                _context.History.Add(historyEntry);
                 await _context.SaveChangesAsync();
 
                 var assignee = await _context.Users.FindAsync(assigneeId);
@@ -110,17 +109,18 @@ namespace LabAssistanteProject.Controllers
             return RedirectToAction("FacilityHead");
         }
 
-        [Authorize(Roles = "admin")]
+        // --- Admin Dashboard ---
         public async Task<IActionResult> Admin()
         {
-            ViewBag.username = User.Identity?.Name;
+            // Role Check
+            var role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
+            if (role != "admin") return RedirectToCorrectDashboard(role);
 
-            // Fetch all counts for the summary cards
+            ViewBag.username = User.Identity?.Name;
             ViewBag.TotalUsers = await _context.Users.CountAsync();
             ViewBag.TotalFacilities = await _context.Facilities.CountAsync();
             ViewBag.TotalRequests = await _context.Requests.CountAsync();
 
-            // Fetch lists for the tabs
             ViewBag.AllUsers = await _context.Users.ToListAsync();
             ViewBag.AllFacilities = await _context.Facilities.ToListAsync();
             ViewBag.AllRequests = await _context.Requests
@@ -132,18 +132,21 @@ namespace LabAssistanteProject.Controllers
 
             return View("~/Views/Roles/Admin.cshtml");
         }
-        // --- Assignee Dashboard (GET) ---
-        [Authorize(Roles = "assignee")]
+
+        // --- Assignee/Technician Dashboard ---
         public async Task<IActionResult> Assignee()
         {
+            // Role Check
+            var role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
+            if (role != "assignee") return RedirectToCorrectDashboard(role);
+
             ViewBag.username = User.Identity?.Name;
             ViewBag.userId = User.FindFirstValue("UserId");
-            ViewBag.role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
+            ViewBag.role = role;
             ViewBag.Message = TempData["Message"] as string;
 
             if (int.TryParse(ViewBag.userId, out int loggedInUserId))
             {
-                // Sirf wahi requests layein jo is specific assignee ko assign hain
                 var myRequests = await _context.Requests
                     .Include(r => r.Requestor)
                     .Include(r => r.Facility)
@@ -157,7 +160,6 @@ namespace LabAssistanteProject.Controllers
             return View("~/Views/Roles/Assignee.cshtml");
         }
 
-        // --- Status & Remarks Update (POST) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int requestId, string newStatus, string remarks)
@@ -173,11 +175,9 @@ namespace LabAssistanteProject.Controllers
             var currentUserIdStr = User.FindFirstValue("UserId");
             int currentUserId = int.TryParse(currentUserIdStr, out int id) ? id : 0;
 
-            // 1. Update Request table
             request.Status = newStatus;
-            request.Remarks = remarks; // Aapka "Answer" yahan save ho raha hai
+            request.Remarks = remarks;
 
-            // 2. Add to History table
             var historyEntry = new Models.History
             {
                 RequestId = requestId,
@@ -202,19 +202,19 @@ namespace LabAssistanteProject.Controllers
             return RedirectToAction("Assignee");
         }
 
-        [Authorize(Roles = "enduser")]
-        public async Task<IActionResult> EndUser() // async banayein kyunke facilities fetch karni hain
+        // --- EndUser Dashboard ---
+        public async Task<IActionResult> EndUser()
         {
-            // 1. User Info set karein (Claims se)
+            // Role Check
+            var role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
+            if (role != "enduser") return RedirectToCorrectDashboard(role);
+
             ViewBag.username = User.Identity?.Name;
             ViewBag.userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.FindFirstValue("email");
             ViewBag.userId = User.FindFirstValue("UserId");
-            ViewBag.role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
-
-            // 2. TempData message set karein (Success/Error ke liye)
+            ViewBag.role = role;
             ViewBag.Message = TempData["Message"] as string;
 
-            // 3. Dropdown ke liye Facilities fetch karein
             ViewBag.Facilities = await _context.Facilities.ToListAsync();
 
             return View("~/Views/Roles/EndUser.cshtml");
