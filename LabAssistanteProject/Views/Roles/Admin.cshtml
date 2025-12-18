@@ -1,0 +1,277 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | LabAssistant</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --success: #2ec4b6;
+            --warning: #ff9f1c;
+            --danger: #e71d36;
+            --dark: #011627;
+            --sidebar-bg: #ffffff;
+            --bg-main: #f8f9fc;
+            --border: #edf2f7;
+        }
+
+        body { background-color: var(--bg-main); font-family: 'Inter', sans-serif; color: var(--dark); }
+
+        /* Sidebar Modern Style */
+        .sidebar {
+            width: 280px; height: 100vh; position: fixed; background: var(--sidebar-bg);
+            border-right: 1px solid var(--border); padding: 1.5rem; z-index: 100;
+        }
+
+        .nav-link {
+            color: #64748b; font-weight: 500; padding: 0.8rem 1rem;
+            border-radius: 10px; margin-bottom: 0.5rem; transition: 0.3s;
+        }
+
+        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-link.active { background: var(--primary); color: white !important; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3); }
+
+        /* Main Content Area */
+        .content { margin-left: 280px; padding: 2rem; }
+
+        /* Card Designs */
+        .card { 
+            border: 1px solid var(--border); border-radius: 16px; background: #fff; 
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card { padding: 1.5rem; border: none; overflow: hidden; position: relative; }
+        .stat-card i { font-size: 2.5rem; position: absolute; right: 10px; bottom: 10px; opacity: 0.1; }
+
+        /* Modern Tables */
+        .table-container { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+        .table thead th { 
+            background: #f8f9fa; text-transform: uppercase; font-size: 0.75rem; 
+            letter-spacing: 0.05em; color: #64748b; padding: 1rem; border: none;
+        }
+        .table td { padding: 1rem; vertical-align: middle; border-top: 1px solid var(--border); }
+
+        /* Badges */
+        .badge-pill { padding: 0.4em 0.8em; border-radius: 6px; font-weight: 600; font-size: 0.7rem; }
+
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="d-flex align-items-center mb-5 px-2">
+            <div class="bg-primary text-white p-2 rounded-3 me-2">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <h4 class="m-0 fw-bold">LabAssist</h4>
+        </div>
+
+        <nav class="nav flex-column nav-pills" id="adminTabs" role="tablist">
+            <a class="nav-link active" data-bs-toggle="pill" href="#overview"><i class="bi bi-grid-fill me-2"></i> Overview</a>
+            <a class="nav-link" data-bs-toggle="pill" href="#users"><i class="bi bi-people-fill me-2"></i> User Logs</a>
+            <a class="nav-link" data-bs-toggle="pill" href="#facilities"><i class="bi bi-door-open-fill me-2"></i> Labs & Assets</a>
+            <a class="nav-link" data-bs-toggle="pill" href="#requests"><i class="bi bi-chat-left-dots-fill me-2"></i> Global Tickets</a>
+            
+            <div class="mt-5 pt-5">
+                <form asp-controller="Auth" asp-action="Logout" method="post">
+                    <button class="btn btn-light w-100 text-danger fw-bold rounded-3">
+                        <i class="bi bi-box-arrow-left me-2"></i> Log Out
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </div>
+
+    <div class="content">
+        <div class="header-top">
+            <div>
+                <h3 class="fw-bold m-0">Administrator Dashboard</h3>
+                <p class="text-muted small">System activity and resource management</p>
+            </div>
+            <div class="d-flex align-items-center bg-white p-2 rounded-4 border">
+                <img src="https://ui-avatars.com/api/?name=@ViewBag.username&background=4361ee&color=fff" class="rounded-circle me-2" width="40">
+                <div class="me-3">
+                    <p class="m-0 small fw-bold">@ViewBag.username</p>
+                    <span class="badge bg-soft-primary text-primary" style="font-size: 10px;">SUPER ADMIN</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content mt-4">
+            <div class="tab-pane fade show active" id="overview">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card stat-card border-start border-primary border-5">
+                            <p class="text-muted small fw-bold mb-1">REGISTERED USERS</p>
+                            <h2 class="fw-bold">@ViewBag.TotalUsers</h2>
+                            <i class="bi bi-people text-primary"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stat-card border-start border-success border-5">
+                            <p class="text-muted small fw-bold mb-1">TOTAL FACILITIES</p>
+                            <h2 class="fw-bold">@ViewBag.TotalFacilities</h2>
+                            <i class="bi bi-building text-success"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stat-card border-start border-warning border-5">
+                            <p class="text-muted small fw-bold mb-1">ACTIVE REQUESTS</p>
+                            <h2 class="fw-bold">@ViewBag.TotalRequests</h2>
+                            <i class="bi bi-ticket-perforated text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-md-8">
+                        <div class="card p-4">
+                            <h6 class="fw-bold mb-4">Request Statistics (Weekly)</h6>
+                            <canvas id="requestChart" height="120"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-4">
+                            <h6 class="fw-bold mb-4">Resource Distribution</h6>
+                            <canvas id="donutChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="users">
+                <div class="table-container">
+                    <table class="table m-0">
+                        <thead>
+                            <tr>
+                                <th>Identity</th>
+                                <th>Email Address</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var u in ViewBag.AllUsers) {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light p-2 rounded me-3">#@u.Id</div>
+                                            <strong>@u.Username</strong>
+                                        </div>
+                                    </td>
+                                    <td>@u.Email</td>
+                                    <td><span class="badge-pill bg-light text-dark border">@u.Role</span></td>
+                                    <td><span class="text-success small fw-bold">● Active</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="facilities">
+                <div class="row g-3">
+                    @foreach (var f in ViewBag.AllFacilities) {
+                        <div class="col-md-6">
+                            <div class="card p-3 d-flex flex-row align-items-center">
+                                <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3 text-primary">
+                                    <i class="bi bi-building-fill h4 m-0"></i>
+                                </div>
+                                <div>
+                                    <h6 class="m-0 fw-bold">@f.Name</h6>
+                                    <p class="text-muted small m-0">@f.Description</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="requests">
+                <div class="table-container">
+                    <table class="table m-0 table-hover">
+                        <thead>
+                            <tr>
+                                <th>Ticket</th>
+                                <th>Requestor</th>
+                                <th>Lab</th>
+                                <th>Status</th>
+                                <th>Assigned Assignee</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in ViewBag.AllRequests) {
+                                <tr>
+                                    <td><span class="fw-bold">#REQ-@r.Id</span><br><small class="text-muted">@r.CreatedAt.ToString("MMM dd")</small></td>
+                                    <td>@r.Requestor?.Username</td>
+                                    <td><span class="badge-pill bg-light text-primary">@r.Facility?.Name</span></td>
+                                    <td>
+                                        <span class="badge-pill @(r.Status == "unassigned" ? "bg-warning-subtle text-warning border-warning" : "bg-info-subtle text-info border-info") border">
+                                            @r.Status
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-person-circle me-2 text-secondary"></i>
+                                            @* Remove space after @ and use parenthesis correctly *@
+                                            @(r.Assignee?.Username ?? "Not Assigned")
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Request Chart (Line)
+        const ctx = document.getElementById('requestChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'New Requests',
+                    data: [12, 19, 3, 5, 2, 3, 7],
+                    borderColor: '#4361ee',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(67, 97, 238, 0.1)'
+                }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+
+        // Donut Chart
+        const ctx2 = document.getElementById('donutChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Users', 'Labs', 'Tickets'],
+                datasets: [{
+                    data: [@ViewBag.TotalUsers, @ViewBag.TotalFacilities, @ViewBag.TotalRequests],
+                    backgroundColor: ['#4361ee', '#2ec4b6', '#ff9f1c'],
+                    borderWidth: 0
+                }]
+            },
+            options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+﻿@model LabAssistanteProject.Models.Requests
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Portal | LabAssistant</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --bg-main: #f8f9fc;
+            --sidebar-bg: #ffffff;
+            --border: #edf2f7;
+            --dark: #011627;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Modern Style */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            z-index: 100;
+        }
+
+        .nav-link {
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: 0.3s;
+        }
+
+            .nav-link:hover {
+                background: #f1f5f9;
+                color: var(--primary);
+            }
+
+            .nav-link.active {
+                background: var(--primary);
+                color: white !important;
+                box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+            }
+
+        /* Main Content */
+        .content {
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Modern Form & Cards */
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            fw-bold;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            transition: 0.2s;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            }
+
+        .btn-submit {
+            background: var(--primary);
+            border: none;
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+            .btn-submit:hover {
+                background: #324fc7;
+                transform: translateY(-1px);
+            }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="d-flex align-items-center mb-5 px-2">
+            <div class="bg-primary text-white p-2 rounded-3 me-2">
+                <i class="bi bi-person-workspace"></i>
+            </div>
+            <h4 class="m-0 fw-bold">LabAssist</h4>
+        </div>
+
+        <nav class="nav flex-column nav-pills">
+            <a class="nav-link active" href="#"><i class="bi bi-plus-circle me-2"></i> New Request</a>
+            <a class="nav-link" href="#"><i class="bi bi-clock-history me-2"></i> My Requests</a>
+            <a class="nav-link" href="#"><i class="bi bi-question-circle me-2"></i> Support</a>
+
+            <div class="mt-auto pt-5">
+                <form asp-controller="Auth" asp-action="Logout" method="post">
+                    <button class="btn btn-light w-100 text-danger fw-bold rounded-3 mt-5 shadow-sm">
+                        <i class="bi bi-box-arrow-left me-2"></i> Log Out
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </div>
+
+    <div class="content">
+        <div class="header-top">
+            <div>
+                <h3 class="fw-bold m-0">User Service Desk</h3>
+                <p class="text-muted small">Submit a ticket for any facility or equipment issues</p>
+            </div>
+            <div class="d-flex align-items-center bg-white p-2 rounded-4 border">
+                <img src="https://ui-avatars.com/api/?name=@ViewBag.username&background=4361ee&color=fff" class="rounded-circle me-2" width="40">
+                <div class="me-3">
+                    <p class="m-0 small fw-bold">@ViewBag.username</p>
+                    <span class="badge bg-soft-primary text-primary border border-primary-subtle" style="font-size: 10px;">ID: @ViewBag.userId</span>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class="alert alert-info border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
+                <i class="bi bi-info-circle-fill me-2 h5 m-0"></i>
+                <div>@ViewBag.Message</div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="card p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-pencil-square text-primary h4 m-0"></i>
+                        </div>
+                        <h5 class="fw-bold m-0">Create Service Request</h5>
+                    </div>
+
+                    <form asp-controller="Requests" asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                        <div class="mb-3">
+                            <label class="form-label" asp-for="FacilityId">Target Facility</label>
+                            <select asp-for="FacilityId" class="form-select shadow-sm" required>
+                                <option value="">Where is the issue?</option>
+                                @if (ViewBag.Facilities != null)
+                                {
+                                    foreach (var facility in ViewBag.Facilities)
+                                    {
+                                        <option value="@facility.Id">@facility.Name</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="FacilityId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" asp-for="Severity">Priority Level</label>
+                            <select asp-for="Severity" class="form-select shadow-sm" required>
+                                <option value="">How urgent is this?</option>
+                                <option value="low">Low (General Query)</option>
+                                <option value="medium">Medium (Needs Attention)</option>
+                                <option value="high">High (Urgent Repair)</option>
+                                <option value="critical">Critical (Immediate Action)</option>
+                            </select>
+                            <span asp-validation-for="Severity" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label" asp-for="Description">Detailed Description</label>
+                            <textarea asp-for="Description" class="form-control shadow-sm" rows="4" placeholder="Briefly explain the problem..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-submit w-100 text-white shadow">
+                            <i class="bi bi-send me-2"></i> Dispatch Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="Pages" asp-action="Help">
+                <div class="card p-4 bg-primary text-white border-0 shadow-lg mb-4" style="background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%) !important;">
+                    <h5 class="fw-bold">Need Help?</h5>
+                    <p class="small opacity-75">Submit your request and our technical team will be assigned within 24 hours. You can track status in 'My Requests'.</p>
+                    <i class="bi bi-lightning-charge-fill display-1 position-absolute end-0 bottom-0 opacity-10 me-2 mb-2"></i>
+                </div>
+                </a>
+
+                <div class="card p-4 border-dashed border-2">
+                    <h6 class="fw-bold"><i class="bi bi-info-circle me-2"></i>Submission Tips</h6>
+                    <ul class="small text-muted ps-3 mt-3">
+                        <li class="mb-2">Be specific about the equipment name.</li>
+                        <li class="mb-2">Mention the exact room or lab number.</li>
+                        <li>Critical severity is only for safety hazards.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+</body>
+</html>

@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<div class="d-flex align-items-center justify-content-center">
+    
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-sm-10 col-md-6 col-lg-6 col-xl-5"> 
+                
+                <div class="card border border-light-subtle shadow-none rounded-3 p-4"> 
+                    <div class="card-body">
+
+                        <div class="text-center mb-5">
+                            <h2 class="fw-bold mb-1">Join Lab Assistant</h2>
+                            <p class="text-muted small">Login to your account to get started</p>
+                        </div>
+
+                        <form asp-action="Login" method="post">
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-medium text-secondary" for="emailInput">Email Address *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0 border-light-subtle rounded-start-3">
+                                        <i class="bi bi-envelope-fill text-muted"></i>
+                                    </span>
+                                    <input name="email" type="email" class="form-control form-control-md border-start-0 border-light-subtle rounded-end-3" 
+                                           id="emailInput" placeholder="Enter your email" required />
+                                </div>
+                                @* <span asp-validation-for="Email" class="text-danger small"></span> *@
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-medium text-secondary" for="passwordInput">Password *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0 border-light-subtle rounded-start-3">
+                                        <i class="bi bi-lock-fill text-muted"></i>
+                                    </span>
+                                    <input name="password" type="password" class="form-control form-control-md border-start-0 border-light-subtle" 
+                                           id="passwordInput" placeholder="Create a strong password" required />
+                                    <button type="button" id="togglePassword" class="btn btn-outline-secondary border-start-0 border-light-subtle rounded-end-3">
+                                        <i class="bi bi-eye-slash-fill"></i>
+                                    </button>
+                                </div>
+                                @* <span asp-validation-for="Password" class="text-danger small"></span> *@
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-md w-100 rounded-3 fw-bold">
+                                    Login Account
+                                </button>
+                            </div>
+
+                            @{
+                                var hasErrors = ViewData.ModelState.Values.Any(v => v.Errors.Count > 0);
+                            }
+                            @if (hasErrors)
+                            {
+                                <div class="alert alert-danger mt-4 p-2 text-center small" role="alert">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <div>@error.ErrorMessage</div>
+                                    }
+                                </div>
+                            }
+
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <p class="text-muted small mb-0">
+                                Don't have an account? 
+                                <a href="/Auth/Register" class="text-primary fw-medium text-decoration-none ms-1">
+                                    Create Account
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('togglePassword')?.addEventListener('click', function (e) {
+        const passwordInput = document.getElementById('passwordInput');
+        const icon = this.querySelector('i');
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // Toggle the eye icon
+        icon.classList.toggle('bi-eye-fill');
+        icon.classList.toggle('bi-eye-slash-fill');
+    });
+</script>

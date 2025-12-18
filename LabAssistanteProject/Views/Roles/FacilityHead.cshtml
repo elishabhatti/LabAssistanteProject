@@ -1,0 +1,284 @@
+﻿@{
+    Layout = null;
+    var requests = (List<LabAssistanteProject.Models.Requests>)ViewBag.Requests;
+    var assignees = (List<LabAssistanteProject.Models.Users>)ViewBag.Assignees;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Management Portal | LabAssistant</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --sidebar-bg: #ffffff;
+            --bg-main: #f8f9fc;
+            --border: #edf2f7;
+            --dark: #011627;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Modern Style */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            z-index: 100;
+        }
+
+        .nav-link {
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: 0.3s;
+        }
+
+            .nav-link:hover {
+                background: #f1f5f9;
+                color: var(--primary);
+            }
+
+            .nav-link.active {
+                background: var(--primary);
+                color: white !important;
+                box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+            }
+
+        /* Main Content Area */
+        .content {
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Card & Table Styling */
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .table thead th {
+            background: #f8f9fa;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            padding: 1rem;
+            border: none;
+        }
+
+        .table td {
+            padding: 1.1rem 1rem;
+            vertical-align: middle;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        /* Custom Select & Button */
+        .form-select-sm {
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+
+        .btn-assign {
+            background: var(--primary);
+            border: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        /* Status & Severity Pills */
+        .badge-pill {
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .sev-high {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .sev-med {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .sev-low {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="d-flex align-items-center mb-5 px-2">
+            <div class="bg-primary text-white p-2 rounded-3 me-2 shadow-sm">
+                <i class="bi bi-briefcase-fill"></i>
+            </div>
+            <h4 class="m-0 fw-bold">LabAssist</h4>
+        </div>
+
+        <nav class="nav flex-column nav-pills">
+            <a class="nav-link active" href="#"><i class="bi bi-grid-1x2-fill me-2"></i> Assignment Desk</a>
+            <a class="nav-link" href="#"><i class="bi bi-people-fill me-2"></i> Technicians</a>
+            <a class="nav-link" href="#"><i class="bi bi-file-earmark-bar-graph me-2"></i> Reports</a>
+
+            <div class="mt-auto pt-5">
+                <form asp-controller="Auth" asp-action="Logout" method="post">
+                    <button class="btn btn-light w-100 text-danger fw-bold rounded-3 mt-5 shadow-sm border">
+                        <i class="bi bi-box-arrow-left me-2"></i> Log Out
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </div>
+
+    <div class="content">
+        <div class="header-top">
+            <div>
+                <h3 class="fw-bold m-0">Facility Head Dashboard</h3>
+                <p class="text-muted small">Manage requests and dispatch technicians</p>
+            </div>
+            <div class="d-flex align-items-center bg-white p-2 rounded-4 border shadow-sm">
+                <img src="https://ui-avatars.com/api/?name=@ViewBag.username&background=4361ee&color=fff" class="rounded-circle me-2" width="40">
+                <div class="me-3">
+                    <p class="m-0 small fw-bold">@ViewBag.username</p>
+                    <span class="badge bg-soft-primary text-primary border border-primary-subtle" style="font-size: 10px;">@ViewBag.role</span>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class="alert alert-info border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center">
+                <i class="bi bi-check-circle-fill text-info h5 m-0 me-2"></i>
+                <div class="small fw-bold">@ViewBag.Message</div>
+            </div>
+        }
+
+        <div class="card border-0 shadow-sm">
+            <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center">
+                <h6 class="m-0 fw-bold"><i class="bi bi-list-ul me-2 text-primary"></i>Service Queue</h6>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-warning text-dark rounded-pill shadow-sm p-2 px-3">Pending: @requests?.Count(r => r.AssigneeId == null)</span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table m-0 table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Ticket</th>
+                            <th>Issue Detail</th>
+                            <th>Priority</th>
+                            <th>Requestor</th>
+                            <th>Current Status</th>
+                            <th class="text-center" style="width: 220px;">Dispatch Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (requests != null && requests.Any())
+                        {
+                            foreach (var request in requests)
+                            {
+                                <tr>
+                                    <td><span class="fw-bold text-dark">#REQ-@request.Id</span><br><small class="text-muted">@request.CreatedAt.ToString("MMM dd")</small></td>
+                                    <td>
+                                        <div class="fw-medium text-primary">@request.Facility?.Name</div>
+                                        <div class="text-muted small text-truncate" style="max-width: 180px;">@request.Description</div>
+                                    </td>
+                                    <td>
+                                        @{
+                                            var sevClass = request.Severity?.ToLower() switch
+                                            {
+                                                "high" or "critical" => "sev-high",
+                                                "medium" => "sev-med",
+                                                _ => "sev-low"
+                                            };
+                                        }
+                                        <span class="badge-pill @sevClass">@request.Severity</span>
+                                    </td>
+                                    <td>
+                                        <div class="small fw-bold">@request.Requestor?.Username</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">@request.Requestor?.Email</div>
+                                    </td>
+                                    <td>
+                                        @{
+                                            string status = request.Status?.ToLower() ?? "unassigned";
+                                            string color = status == "completed" ? "success" : (status == "work-in-progress" ? "primary" : "secondary");
+                                        }
+                                        <span class="badge bg-@color bg-opacity-10 text-@color border border-@color border-opacity-25 p-1 px-2" style="font-size: 0.7rem; border-radius: 6px;">
+                                            @status.ToUpper()
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <form asp-controller="Roles" asp-action="Assign" method="post" class="d-flex gap-1">
+                                            <input type="hidden" name="requestId" value="@request.Id" />
+                                            <select name="assigneeId" class="form-select form-select-sm" required>
+                                                <option value="">Select Staff</option>
+                                                @foreach (var assignee in assignees)
+                                                {
+                                                    <option value="@assignee.Id" selected="@(request.AssigneeId == assignee.Id)">
+                                                        @assignee.Username
+                                                    </option>
+                                                }
+                                            </select>
+                                            <button type="submit" class="btn btn-primary btn-sm btn-assign px-3 shadow-sm">
+                                                Assign
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>    
+                                <td colspan="6" class="text-center py-5 text-muted italic">No service requests found in the system.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

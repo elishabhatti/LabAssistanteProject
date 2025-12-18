@@ -1,0 +1,244 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assignee Portal | LabAssistant</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --success: #2ec4b6;
+            --warning: #ff9f1c;
+            --danger: #e71d36;
+            --dark: #011627;
+            --sidebar-bg: #ffffff;
+            --bg-main: #f8f9fc;
+            --border: #edf2f7;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Modern Style */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            z-index: 100;
+        }
+
+        .nav-link {
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: 0.3s;
+        }
+
+            .nav-link:hover {
+                background: #f1f5f9;
+                color: var(--primary);
+            }
+
+            .nav-link.active {
+                background: var(--primary);
+                color: white !important;
+                box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+            }
+
+        /* Main Content Area */
+        .content {
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        /* Card Designs */
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #fff;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Modern Tables */
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background: #f8f9fa;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            padding: 1rem;
+            border: none;
+        }
+
+        .table td {
+            padding: 1.2rem 1rem;
+            vertical-align: middle;
+            border-top: 1px solid var(--border);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Form elements styling */
+        .form-control-custom {
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+            .form-control-custom:focus {
+                border-color: var(--primary);
+                box-shadow: none;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="d-flex align-items-center mb-5 px-2">
+            <div class="bg-primary text-white p-2 rounded-3 me-2">
+                <i class="bi bi-tools"></i>
+            </div>
+            <h4 class="m-0 fw-bold">LabAssist</h4>
+        </div>
+
+        <nav class="nav flex-column nav-pills">
+            <a class="nav-link active" href="#"><i class="bi bi-list-task me-2"></i> My Tasks</a>
+            <a class="nav-link" href="#"><i class="bi bi-check2-circle me-2"></i> History</a>
+
+            <div class="mt-auto pt-5">
+                <form asp-controller="Auth" asp-action="Logout" method="post">
+                    <button class="btn btn-light w-100 text-danger fw-bold rounded-3 mt-5">
+                        <i class="bi bi-box-arrow-left me-2"></i> Log Out
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </div>
+
+    <div class="content">
+        <div class="header-top">
+            <div>
+                <h3 class="fw-bold m-0">Technician Portal</h3>
+                <p class="text-muted small">Update and resolve your assigned maintenance tasks</p>
+            </div>
+            <div class="d-flex align-items-center bg-white p-2 rounded-4 border">
+                <img src="https://ui-avatars.com/api/?name=@ViewBag.username&background=4361ee&color=fff" class="rounded-circle me-2" width="40">
+                <div class="me-3">
+                    <p class="m-0 small fw-bold">@ViewBag.username</p>
+                    <span class="badge bg-soft-info text-info border border-info" style="font-size: 10px;">ID: @ViewBag.userId</span>
+                </div>
+            </div>
+        </div>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-info border-0 shadow-sm rounded-4 mb-4">
+                <i class="bi bi-info-circle me-2"></i> @ViewBag.Message
+            </div>
+        }
+
+        <div class="table-container shadow-sm">
+            <div class="p-3 border-bottom bg-white d-flex justify-content-between align-items-center">
+                <h6 class="m-0 fw-bold"><i class="bi bi-stack me-2"></i>Assigned Work Orders</h6>
+                <span class="badge bg-primary rounded-pill">@(ViewBag.MyRequests?.Count ?? 0) Active</span>
+            </div>
+            <table class="table m-0 table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">ID</th>
+                        <th style="width: 25%;">Request Info</th>
+                        <th style="width: 20%;">Facility</th>
+                        <th style="width: 45%;">Update Status & Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.MyRequests != null && ((IEnumerable<dynamic>)ViewBag.MyRequests).Any())
+                    {
+                        foreach (var req in ViewBag.MyRequests)
+                        {
+                            <tr>
+                                <td class="fw-bold text-primary">#@req.Id</td>
+                                <td>
+                                    <strong>@req.Requestor?.Username</strong><br>
+                                    <small class="text-muted d-block" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        @req.Description
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="text-dark fw-medium"><i class="bi bi-building me-1"></i>@req.Facility?.Name</span>
+                                    <div class="mt-1">
+                                        <span class="badge rounded-pill @(req.Status == "Completed" ? "bg-success" : (req.Status == "Work-In-Progress" ? "bg-info" : "bg-warning text-dark"))" style="font-size: 0.65rem;">
+                                            @req.Status
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <form asp-action="UpdateStatus" method="post" class="row g-2 align-items-center">
+                                        <input type="hidden" name="requestId" value="@req.Id" />
+
+                                        <div class="col-md-12">
+                                            <textarea name="remarks" class="form-control form-control-custom mb-2" rows="1" placeholder="Add technical notes..." required>@req.Remarks</textarea>
+                                        </div>
+
+                                        <div class="col-7 col-md-8">
+                                            <select name="newStatus" class="form-select form-select-sm form-control-custom">
+                                                <option value="Work-In-Progress" selected=@(req.Status == "Work-In-Progress")>Work-In-Progress</option>
+                                                <option value="Completed" selected=@(req.Status == "Completed")>Completed</option>
+                                                <option value="On-Hold" selected=@(req.Status == "On-Hold")>On-Hold</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-5 col-md-4">
+                                            <button type="submit" class="btn btn-primary btn-sm w-100 rounded-3 fw-bold">Update</button>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <i class="bi bi-emoji-smile d-block h1 text-muted"></i>
+                                <p class="text-muted">No pending tasks assigned to you.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Help Center | LabAssistant</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --sidebar-bg: #ffffff;
+            --bg-main: #f8f9fc;
+            --border: #edf2f7;
+            --dark: #011627;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: 'Inter', sans-serif;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Modern Style */
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            z-index: 100;
+        }
+
+        .nav-link {
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: 0.3s;
+        }
+
+            .nav-link:hover {
+                background: #f1f5f9;
+                color: var(--primary);
+            }
+
+            .nav-link.active {
+                background: var(--primary);
+                color: white !important;
+            }
+
+        /* Main Content */
+        .content {
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        /* Accordion Customization */
+        .accordion-item {
+            border: 1px solid var(--border);
+            border-radius: 12px !important;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: rgba(67, 97, 238, 0.05);
+            color: var(--primary);
+            box-shadow: none;
+        }
+
+        .accordion-button {
+            font-weight: 600;
+            padding: 1.2rem;
+        }
+
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            margin-right: 10px;
+        }
+
+        .support-card {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 2rem;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="d-flex align-items-center mb-5 px-2">
+            <div class="bg-primary text-white p-2 rounded-3 me-2 shadow-sm">
+                <i class="bi bi-patch-question-fill"></i>
+            </div>
+            <h4 class="m-0 fw-bold">LabAssist</h4>
+        </div>
+
+        <nav class="nav flex-column nav-pills">
+            <a class="nav-link" href="@Url.Action("Index", "Home")"><i class="bi bi-house-door me-2"></i> Dashboard</a>
+            <a class="nav-link active" href="#"><i class="bi bi-book me-2"></i> User Guide</a>
+            <a class="nav-link" href="#"><i class="bi bi-chat-dots me-2"></i> Contact IT</a>
+
+            <div class="mt-auto pt-5">
+                <form asp-controller="Auth" asp-action="Logout" method="post">
+                    <button class="btn btn-light w-100 text-danger fw-bold rounded-3 mt-5 shadow-sm border">
+                        <i class="bi bi-box-arrow-left me-2"></i> Log Out
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </div>
+
+    <div class="content">
+        <div class="mb-5">
+            <h2 class="fw-bold m-0 text-primary">Help & Support Center 📖</h2>
+            <p class="text-muted">Common questions and step-by-step guides for all roles.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="accordion" id="helpAccordion">
+
+                    <div class="accordion-item shadow-sm">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                <i class="bi bi-person-plus me-2 text-primary"></i> For End-Users: Create a Request
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <div class="mb-3"><span class="step-number">1</span> Login as an <strong>End-User</strong>.</div>
+                                <div class="mb-3"><span class="step-number">2</span> Select the <strong>Facility</strong> where the issue exists.</div>
+                                <div class="mb-3"><span class="step-number">3</span> Choose <strong>Severity</strong> (Critical issues get priority).</div>
+                                <div class="mb-3"><span class="step-number">4</span> Submit! Your Request ID will appear instantly.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item shadow-sm">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                <i class="bi bi-shield-check me-2 text-primary"></i> For Facility Heads: Assigning Tasks
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <p>Delegate work to the right technician:</p>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Check the <strong>Unassigned</strong> queue.</li>
+                                    <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Select a technician from the <strong>Assign To</strong> list.</li>
+                                    <li><i class="bi bi-check2-circle text-success me-2"></i>Click <strong>Assign</strong> to start the workflow.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item shadow-sm">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                <i class="bi bi-tools me-2 text-primary"></i> For Assignees: Completing Tasks
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <p class="small text-muted mb-3">Keep the status updated so users know the progress:</p>
+                                <div class="d-flex align-items-center p-3 border rounded-3 bg-light mb-2">
+                                    <i class="bi bi-chat-left-text h4 me-3 text-primary"></i>
+                                    <div><strong>Add Remarks:</strong> Always explain what work was done.</div>
+                                </div>
+                                <div class="d-flex align-items-center p-3 border rounded-3 bg-light">
+                                    <i class="bi bi-flag h4 me-3 text-success"></i>
+                                    <div><strong>Set to 'Completed':</strong> Only when the issue is fully resolved.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card mt-4 border-0 shadow-sm overflow-hidden">
+                        <div class="bg-dark text-white p-3 fw-bold small">STATUS REFERENCE KEY</div>
+                        <table class="table table-hover m-0">
+                            <thead class="table-light small">
+                                <tr><th>Status</th><th>System Behavior</th></tr>
+                            </thead>
+                            <tbody class="small">
+                                <tr><td><span class="badge bg-secondary opacity-75">Unassigned</span></td><td>Waiting for Facility Head action.</td></tr>
+                                <tr><td><span class="badge bg-primary">Work-In-Progress</span></td><td>Technician has started the job.</td></tr>
+                                <tr><td><span class="badge bg-success">Completed</span></td><td>Issue closed; user can see remarks.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card support-card shadow-lg text-center">
+                    <i class="bi bi-headset display-4 mb-3"></i>
+                    <h4 class="fw-bold">Direct Support</h4>
+                    <p class="small opacity-75">Facing technical glitches or login issues? Contact our administrator.</p>
+                    <hr class="opacity-25">
+                    <p class="mb-1 fw-bold">Email Support:</p>
+                    <a href="mailto:elishajameel270@gmail.com" class="text-white text-decoration-none small">elishajameel270@gmail.com</a>
+                </div>
+
+                <div class="card mt-4 p-3 border-dashed border-2">
+                    <h6 class="fw-bold small mb-2">System Version</h6>
+                    <code class="text-primary small">LabAssist v2.0.4 (JWT-Secure)</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
