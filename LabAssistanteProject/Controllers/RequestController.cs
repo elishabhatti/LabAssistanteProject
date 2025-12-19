@@ -1,6 +1,7 @@
 ﻿// LabAssistanteProject.Controllers/RequestsController.cs
 using LabAssistanteProject.Data;
 using LabAssistanteProject.Models;
+using LabAssistanteProject.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,11 +14,14 @@ namespace LabAssistanteProject.Controllers
     public class RequestsController : Controller
     {
         private readonly MyAppContext _context;
+        private readonly EmailService _emailService;
 
-        public RequestsController(MyAppContext context)
+        public RequestsController(MyAppContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
+
         [HttpPost]
         public async Task<IActionResult> Create(Requests request)
         {
@@ -44,6 +48,21 @@ namespace LabAssistanteProject.Controllers
             {
                 _context.Requests.Add(request);
                 await _context.SaveChangesAsync();
+
+                // --- Send Email Notification ---
+                var facilityHead = await _context.Users
+                                    .FirstOrDefaultAsync(u => u.Role == "facility_head");
+                if (facilityHead != null)
+                {
+                    string subject = "New Service Request Submitted";
+                    string body = $"Hello {facilityHead.Username},<br>" +
+                                  $"A new request has been submitted by {User.Identity?.Name} " +
+                                  $"for {request.FacilityId} (Facility ID).<br>" +
+                                  $"Please check your dashboard to assign it.";
+
+                    // assuming you injected EmailService
+                    _emailService.SendEmail(facilityHead.Email, subject, body);
+                }
 
                 TempData["Message"] = $"Service Request submitted successfully!";
             }
