@@ -190,58 +190,51 @@
                                         <strong>#REQ-@r.Id</strong><br />
                                         <small class="text-muted">@r.CreatedAt.ToString("MMM dd")</small>
                                     </td>
-
                                     <td>
                                         <div class="fw-bold">@r.Requestor?.Username</div>
                                         <small class="text-muted">@r.Description</small>
                                     </td>
-
                                     <td class="fw-semibold">@r.Facility?.Name</td>
-
                                     <td>
                                         <span class="badge-status
-                                            @(r.Status == "Completed" ? "bg-success-subtle text-success" :
-                                                                                    r.Status == "Work-In-Progress" ? "bg-info-subtle text-info" :
-                                                                                    "bg-warning-subtle text-warning")">
+                                @(r.Status == "Completed" ? "bg-success-subtle text-success" :
+                                                                        r.Status == "Work-In-Progress" ? "bg-info-subtle text-info" :
+                                                                        "bg-warning-subtle text-warning")">
                                     @r.Status
                                 </span>
                             </td>
-
-                                    <td>
-                                        <form asp-action="UpdateStatus" method="post" class="bg-light p-2 rounded-3">
-                                            <input type="hidden" name="requestId" value="@r.Id" />
-                                            <textarea name="remarks" class="form-control mb-2" rows="1" required>@r.Remarks</textarea>
-                                            <div class="d-flex gap-2">
-                                                <select name="newStatus" class="form-select form-select-sm">
-                                                    <option selected="@(@r.Status == "Work-In-Progress")">Work-In-Progress</option>
-                                                    <option selected="@(@r.Status == "Completed")">Completed</option>
-                                                    <option selected="@(@r.Status == "On-Hold")">On-Hold</option>
-                                                </select>
-                                                <button class="btn btn-primary btn-sm px-3">Update</button>
-                                            </div>
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form asp-action="CompleteRequest" method="post">
-                                            <input type="hidden" name="requestId" value="@r.Id" />
-                                            <button class="btn btn-success btn-sm">
-                                                <i class="bi bi-check-circle me-1"></i> Complete
-                                            </button>
-                                        </form>
-
-                                    </td>
-                                </tr>
+                            <td>
+                                <textarea class="form-control form-control-sm mb-2" rows="1" placeholder="Add remarks">@r.Remarks</textarea>
+                                <div class="d-flex gap-2">
+                                    <select class="form-select form-select-sm w-50">
+                                        <option selected="@(@r.Status == "Work-In-Progress")">Work-In-Progress</option>
+                                        <option selected="@(@r.Status == "Completed")">Completed</option>
+                                        <option selected="@(@r.Status == "On-Hold")">On-Hold</option>
+                                    </select>
+                                    <button class="btn btn-primary btn-sm px-3">Update</button>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <form asp-action="CompleteRequest" method="post" class="m-0">
+                                    <input type="hidden" name="requestId" value="@r.Id" />
+                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">
+                                        <i class="bi bi-check-circle me-1"></i> Complete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
                                                 }
                         }
                         else
                         {
                             <tr>
-                                <td colspan="5" class="text-center py-5 text-muted fw-bold">
+                                <td colspan="6" class="text-center py-5 text-muted fw-bold">
                                     No tasks assigned 🎉
                                 </td>
                             </tr>
                         }
                     </tbody>
+
                 </table>
             </div>
         </div>

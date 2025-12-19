@@ -191,18 +191,28 @@
                                 </td>
 
                                 <td>
-                                    <form asp-controller="Roles" asp-action="Assign" method="post" class="d-flex gap-2">
-                                        <input type="hidden" name="requestId" value="@r.Id" />
-                                        <select name="assigneeId" class="form-select form-select-sm" required>
-                                            <option value="">Select</option>
-                                            @foreach (var a in assignees)
-                                            {
-                                                <option value="@a.Id">@a.Username</option>
-                                            }
-                                        </select>
-                                        <button class="btn btn-primary btn-sm">Assign</button>
-                                    </form>
+                                    @if (r.AssigneeId != null && r.Assignee != null)
+                                    {
+                                        <!-- Show assigned user's name -->
+                                        <span class="fw-semibold">@r.Assignee.Username</span>
+                                    }
+                                    else
+                                    {
+                                        <!-- Show dropdown to assign -->
+                                        <form asp-controller="Roles" asp-action="Assign" method="post" class="d-flex gap-2">
+                                            <input type="hidden" name="requestId" value="@r.Id" />
+                                            <select name="assigneeId" class="form-select form-select-sm" required>
+                                                <option value="">Select</option>
+                                                @foreach (var a in assignees)
+                                                {
+                                                    <option value="@a.Id">@a.Username</option>
+                                                }
+                                            </select>
+                                            <button class="btn btn-primary btn-sm">Assign</button>
+                                        </form>
+                                    }
                                 </td>
+
                             </tr>
                         }
                     </tbody>
