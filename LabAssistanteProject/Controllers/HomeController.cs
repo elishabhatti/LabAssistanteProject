@@ -14,7 +14,17 @@ namespace LabAssistanteProject.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly MyAppContext _context;
-
+        private IActionResult RedirectToCorrectDashboard(string? currentRole)
+        {
+            return currentRole switch
+            {
+                "admin" => RedirectToAction("Admin","Roles"),
+                "facility_head" => RedirectToAction("FacilityHead", "Roles"),
+                "assignee" => RedirectToAction("Assignee", "Roles"),
+                "enduser" => RedirectToAction("EndUser", "Roles"),
+                _ => RedirectToAction("Login", "Auth")
+            };
+        }
         public HomeController(ILogger<HomeController> logger, MyAppContext context)
         {
             _logger = logger;
@@ -28,6 +38,7 @@ namespace LabAssistanteProject.Controllers
             var userIdString = User.FindFirstValue("UserId");
             var username = User.Identity?.Name;
             var role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
+            if (role != "enduser") return RedirectToCorrectDashboard(role);
 
             if (!int.TryParse(userIdString, out int requestorId))
             {

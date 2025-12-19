@@ -3,80 +3,167 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - LabAssistanteProject</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="~/LabAssistanteProject.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - LabAssist</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-main: #f8fafc; /* Light grey background for content contrast */
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
         * {
             font-family: 'Urbanist', sans-serif;
+            box-sizing: border-box;
         }
-        /* Optional: Thoda sa padding de sakte hain navbar ko */
-        .navbar {
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
-        }
-    </style>
 
+        /* 1. Layout Fix: Ensure footer stays at the bottom */
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        /* 2. Navbar Styling */
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary) !important;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-muted) !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+            .nav-link:hover {
+                color: var(--primary) !important;
+                background-color: rgba(37, 99, 235, 0.05);
+            }
+
+            .nav-link.active {
+                color: var(--primary) !important;
+                font-weight: 600;
+            }
+
+        /* 3. Main Content Wrapper */
+        .main-container {
+            flex: 1 0 auto;
+            padding: 3rem 0;
+        }
+
+        /* 4. Footer Styling */
+        .footer {
+            flex-shrink: 0;
+            background: #ffffff;
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Utilities */
+        .btn-logout {
+            color: #dc3545;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+            .btn-logout:hover {
+                background-color: #fff5f5;
+                border-color: #feb2b2;
+                color: #c53030;
+            }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom mb-3">
-            <div class="container-fluid">
 
-                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">
-                    LabAssistanteProject
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-shield-check me-2"></i> LabAssist
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-
+                    <ul class="navbar-nav ms-auto align-items-center">
                         <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="Roles" asp-action="EndUser">Create Request</a>
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "EndUser" ? "active" : "")"
+                               href="/Roles/EndUser">
+                                <i class="bi bi-plus-square me-1"></i> New Request
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark fw-medium" asp-area="" asp-controller="Pages" asp-action="Help">Help</a>
+                            <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")"
+                               href="/">
+                                <i class="bi bi-list-ul me-1"></i> Track Tickets
+                            </a>
                         </li>
 
-                        <li class="nav-item">
-                            <form asp-controller="Auth" asp-action="Logout" method="post" class="d-flex">
-                                <button type="submit" class="btn btn-sm btn-outline-danger my-1 ms-3 fw-medium">
-                                    🚪 Logout
+                        <li class="nav-item ms-lg-3">
+                            <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-logout px-3">
+                                    <i class="bi bi-box-arrow-left me-1"></i> Sign Out
                                 </button>
                             </form>
                         </li>
-
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div>
+        <div>
             @RenderBody()
-        </main>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer">
         <div class="container">
-            &copy; 2025 - LabAssistanteProject - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <span>&copy; 2025 <strong>LabAssistanteProject</strong>. All rights reserved.</span>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+                    <a href="#" class="text-decoration-none text-muted me-3">Privacy Policy</a>
+                    <a href="#" class="text-decoration-none text-muted">Support</a>
+                </div>
+            </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

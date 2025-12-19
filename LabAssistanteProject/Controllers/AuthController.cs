@@ -1,11 +1,13 @@
 ﻿using LabAssistanteProject.Data;
 using LabAssistanteProject.Helpers;
 using LabAssistanteProject.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
@@ -179,6 +181,47 @@ namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
 
             return View(user);
         }
+        // GET: /Auth/ChangePassword
+        [HttpGet]
+        [Authorize] // Sirf logged in user access kar sake
+        public IActionResult ChangePassword() => View();
+
+        // POST: /Auth/ChangePassword
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
+        {
+            // 1. Basic Validation
+            if (newPassword != confirmPassword)
+            {
+                ModelState.AddModelError("", "New password and confirmation do not match.");
+                return View();
+            }
+
+            // 2. Get Current User
+            var email = User.FindFirstValue(ClaimTypes.Email) ?? User.FindFirstValue("email");
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null) return RedirectToAction("Login");
+
+            // 3. Verify Old Password
+            if (!BCrypt.Net.BCrypt.Verify(oldPassword, user.Password))
+            {
+                ModelState.AddModelError("", "Current password is incorrect.");
+                return View();
+            }
+
+            // 4. Hash & Save New Password
+            user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            TempData["Message"] = "Password changed successfully!";
+
+            // Role ke mutabiq dashboard pe wapis bhej dein
+            return RedirectToRolePage(user);
+        }
 
         // ------------------ LOGOUT ------------------
         [HttpPost]
@@ -200,5 +243,6 @@ namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
                 SameSite = SameSiteMode.Strict
             });
         }
+
     }
 }

@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace LabAssistanteProject.Controllers
 {
@@ -19,7 +17,7 @@ namespace LabAssistanteProject.Controllers
         }
 
         // --- Helper: Redirect Logic ---
-        private IActionResult RedirectToCorrectDashboard(string currentRole)
+        private IActionResult RedirectToCorrectDashboard(string? currentRole)
         {
             return currentRole switch
             {
@@ -31,7 +29,7 @@ namespace LabAssistanteProject.Controllers
             };
         }
 
-        // --- FacilityHead Dashboard ---
+        // --- Facility Head Dashboard ---
         [HttpGet]
         public async Task<IActionResult> FacilityHead()
         {
@@ -55,7 +53,7 @@ namespace LabAssistanteProject.Controllers
             ViewBag.Requests = allRequests;
 
             var assignees = await _context.Users
-                .Where(u => u.Role == "Assignee" || u.Role == "Technician")
+                .Where(u => u.Role == "Assignee")
                 .OrderBy(u => u.Username)
                 .ToListAsync();
 
@@ -171,7 +169,7 @@ namespace LabAssistanteProject.Controllers
                 return RedirectToAction("Assignee");
             }
 
-            string oldStatus = request.Status;
+            string oldStatus = request.Status ?? "Unknown";
             var currentUserIdStr = User.FindFirstValue("UserId");
             int currentUserId = int.TryParse(currentUserIdStr, out int id) ? id : 0;
 

@@ -2,85 +2,203 @@
 @{
     Layout = null;
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Provisioning | LabAssistant</title>
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- Urbanist -->
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --bg-main: #f8fafc;
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            font-family: 'Urbanist', sans-serif;
+        }
+
         body {
-            background: #0f172a;
+            min-height: 100vh;
+            background-color: var(--bg-main);
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            min-height: 100vh;
-            font-family: 'Inter', sans-serif;
+            justify-content: center;
+            padding: 2rem 0;
         }
 
+        /* Card */
         .admin-card {
             background: white;
-            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
             padding: 2.5rem;
             width: 100%;
-            max-width: 450px;
-            margin: auto;
+            max-width: 460px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
         }
 
-        .btn-dark {
-            background: #0f172a;
+            .admin-card:hover {
+                transform: translateY(-3px);
+            }
+
+        /* Brand / Warning */
+        .brand-logo {
+            width: 56px;
+            height: 56px;
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--danger);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 1.2rem;
+        }
+
+        /* Form */
+        .form-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid var(--border-color);
+            padding: 0.65rem 1rem;
+            font-size: 0.9rem;
+            border-radius: 10px;
+        }
+
+            .form-control:focus,
+            .form-select:focus {
+                border-color: var(--danger);
+                box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+            }
+
+        /* Button */
+        .btn-danger {
+            background-color: var(--danger);
             border: none;
-            padding: 0.8rem;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 0.75rem;
+            transition: 0.2s;
+        }
+
+            .btn-danger:hover {
+                background-color: #b91c1c;
+            }
+
+        .security-note {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 0.75rem;
         }
     </style>
 </head>
 <body>
-    <div class="admin-card shadow-lg">
-        <div class="text-center mb-4">
-            <div class="bg-danger text-white d-inline-block p-3 rounded-circle mb-3">
-                <i class="bi bi-shield-lock-fill fs-3"></i>
+
+    <div class="container px-3">
+        <div class="admin-card mx-auto">
+
+            <div class="brand-logo">
+                <i class="bi bi-shield-lock-fill"></i>
             </div>
-            <h3 class="fw-bold">Admin Registration</h3>
-            <p class="text-muted small">Authorization required to create administrative accounts</p>
+
+            <div class="text-center mb-4">
+                <h3 class="fw-bold mb-1">Admin Provisioning</h3>
+                <p class="text-muted small">
+                    Restricted access — authorization required
+                </p>
+            </div>
+
+            <form asp-action="AdminRegister" method="post">
+
+                <div class="mb-3">
+                    <label class="form-label">Admin Secret Key</label>
+                    <input type="password"
+                           name="SecretKey"
+                           class="form-control"
+                           placeholder="Enter system secret"
+                           required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input asp-for="Username"
+                           class="form-control"
+                           placeholder="admin_user"
+                           required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input asp-for="Email"
+                           type="email"
+                           class="form-control"
+                           placeholder="admin@lab.com"
+                           required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input asp-for="Password"
+                           type="password"
+                           class="form-control"
+                           placeholder="••••••••"
+                           required />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Assign System Role</label>
+                    <select asp-for="Role" class="form-select">
+                        <option value="admin">Super Administrator</option>
+                        <option value="facility_head">Facility Head</option>
+                        <option value="assignee">Assignee / Technician</option>
+                    </select>
+                </div>
+
+                <div class="security-note mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                    This operation grants elevated system privileges. Ensure authorization
+                    before proceeding.
+                </div>
+
+                <button type="submit" class="btn btn-danger w-100 shadow-sm">
+                    Verify & Create Account
+                </button>
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger border-0 rounded-3 small py-2 mt-3 text-center">
+                        <i class="bi bi-x-circle-fill me-2"></i>
+                        @TempData["Error"]
+                    </div>
+                }
+            </form>
+
         </div>
-
-        <form asp-action="AdminRegister" method="post">
-            <div class="mb-3">
-                <label class="form-label fw-bold small">Admin Secret Key</label>
-                <input type="password" name="SecretKey" class="form-control" placeholder="Enter System Secret" required />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-bold small">Username</label>
-                <input asp-for="Username" class="form-control" placeholder="admin_user" required />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-bold small">Email</label>
-                <input asp-for="Email" type="email" class="form-control" placeholder="admin@lab.com" required />
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label fw-bold small">Password</label>
-                <input asp-for="Password" type="password" class="form-control" required />
-            </div>
-
-            <div class="mb-4">
-                <label class="form-label fw-bold small">Assign High Role</label>
-                <select asp-for="Role" class="form-select">
-                    <option value="admin">Super Administrator</option>
-                    <option value="facility_head">Facility Head</option>
-                    <option value="assignee">Assignee / Technician</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn btn-dark w-100 fw-bold">Verify & Create Account</button>
-
-            @if (TempData["Error"] != null)
-            {
-                <div class="alert alert-danger mt-3 small text-center">@TempData["Error"]</div>
-            }
-        </form>
     </div>
+
 </body>
 </html>

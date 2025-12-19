@@ -1,325 +1,317 @@
-﻿@{
-    Layout = null;
-}
+﻿<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard | LabAssistant</title>
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    :root {
+        --primary: #2563eb;
+        --bg-main: #f8fafc;
+        --border-color: #e2e8f0;
+        --text-muted: #64748b;
+        --success: #10b981;
+        --warning: #f59e0b;
+    }
 
-    <style>
-        :root {
-            --primary: #4361ee;
-            --success: #2ec4b6;
-            --warning: #ff9f1c;
-            --danger: #e71d36;
-            --dark: #011627;
-            --sidebar-bg: #ffffff;
-            --bg-main: #f8f9fc;
-            --border: #edf2f7;
+    body {
+        background-color: var(--bg-main);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Admin Navigation */
+    .admin-sub-nav {
+        background: #ffffff;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+        .admin-sub-nav .nav-link {
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 1.25rem 1rem;
+            border-bottom: 3px solid transparent;
+            border-radius: 0;
+            transition: all 0.2s;
         }
 
-        body { background-color: var(--bg-main); font-family: 'Inter', sans-serif; color: var(--dark); }
+            .admin-sub-nav .nav-link:hover {
+                color: var(--primary);
+            }
 
-        /* Sidebar Modern Style */
-        .sidebar {
-            width: 280px; height: 100vh; position: fixed; background: var(--sidebar-bg);
-            border-right: 1px solid var(--border); padding: 1.5rem; z-index: 100;
-        }
+            .admin-sub-nav .nav-link.active {
+                color: var(--primary) !important;
+                background: transparent !important;
+                border-bottom-color: var(--primary);
+            }
 
-        .nav-link {
-            color: #64748b; font-weight: 500; padding: 0.8rem 1rem;
-            border-radius: 10px; margin-bottom: 0.5rem; transition: 0.3s;
-        }
+    /* Cards & Containers */
+    .stat-card {
+        border: 1px solid var(--border-color);
+        border-top: 4px solid var(--primary);
+        border-radius: 12px;
+        background: white;
+        padding: 1.5rem;
+    }
 
-        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
-        .nav-link.active { background: var(--primary); color: white !important; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3); }
+    .table-container {
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background: white;
+        overflow: hidden;
+    }
 
-        /* Main Content Area */
-        .content { margin-left: 280px; padding: 2rem; }
+    .badge-status {
+        padding: 0.35rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid;
+    }
 
-        /* Card Designs */
-        .card { 
-            border: 1px solid var(--border); border-radius: 16px; background: #fff; 
-            margin-bottom: 1.5rem;
-        }
+    .profile-pill {
+        border: 1px solid var(--border-color);
+        padding: 0.4rem 0.8rem;
+        border-radius: 50px;
+        background: white;
+    }
 
-        .stat-card { padding: 1.5rem; border: none; overflow: hidden; position: relative; }
-        .stat-card i { font-size: 2.5rem; position: absolute; right: 10px; bottom: 10px; opacity: 0.1; }
+    /* Chart Heights */
+    .chart-wrapper {
+        position: relative;
+        height: 300px; /* Fixed height for rendering */
+        width: 100%;
+    }
+</style>
 
-        /* Modern Tables */
-        .table-container { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
-        .table thead th { 
-            background: #f8f9fa; text-transform: uppercase; font-size: 0.75rem; 
-            letter-spacing: 0.05em; color: #64748b; padding: 1rem; border: none;
-        }
-        .table td { padding: 1rem; vertical-align: middle; border-top: 1px solid var(--border); }
+<div class="admin-sub-nav shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+        <ul class="nav nav-pills" id="adminTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#overview"><i class="bi bi-grid-1x2 me-2"></i>Overview</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#users"><i class="bi bi-people me-2"></i>User Logs</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#facilities"><i class="bi bi-door-open me-2"></i>Labs</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#requests"><i class="bi bi-ticket-perforated me-2"></i>Tickets</a>
+            </li>
+        </ul>
 
-        /* Badges */
-        .badge-pill { padding: 0.4em 0.8em; border-radius: 6px; font-weight: 600; font-size: 0.7rem; }
-
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    </style>
-</head>
-<body>
-
-    <div class="sidebar">
-        <div class="d-flex align-items-center mb-5 px-2">
-            <div class="bg-primary text-white p-2 rounded-3 me-2">
-                <i class="bi bi-shield-check"></i>
-            </div>
-            <h4 class="m-0 fw-bold">LabAssist</h4>
+        <div class="profile-pill d-none d-md-flex align-items-center">
+            <img src="https://ui-avatars.com/api/?name=@ViewBag.username&background=2563eb&color=fff" class="rounded-circle me-2" width="28">
+            <span class="small fw-bold">Admin Panel</span>
         </div>
+    </div>
+</div>
 
-        <nav class="nav flex-column nav-pills" id="adminTabs" role="tablist">
-            <a class="nav-link active" data-bs-toggle="pill" href="#overview"><i class="bi bi-grid-fill me-2"></i> Overview</a>
-            <a class="nav-link" data-bs-toggle="pill" href="#users"><i class="bi bi-people-fill me-2"></i> User Logs</a>
-            <a class="nav-link" data-bs-toggle="pill" href="#facilities"><i class="bi bi-door-open-fill me-2"></i> Labs & Assets</a>
-            <a class="nav-link" data-bs-toggle="pill" href="#requests"><i class="bi bi-chat-left-dots-fill me-2"></i> Global Tickets</a>
-            
-            <div class="mt-5 pt-5">
-                <form asp-controller="Auth" asp-action="Logout" method="post">
-                    <button class="btn btn-light w-100 text-danger fw-bold rounded-3">
-                        <i class="bi bi-box-arrow-left me-2"></i> Log Out
-                    </button>
-                </form>
-            </div>
-        </nav>
+<div class="container mb-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h2 class="fw-bold m-0">Administrator Dashboard</h2>
+            <p class="text-muted small">System activity monitoring and resource control</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                <button class="btn btn-outline-danger btn-sm rounded-pill px-4 fw-bold">
+                    <i class="bi bi-box-arrow-left me-2"></i>Sign Out
+                </button>
+            </form>
+        </div>
     </div>
 
-    <div class="content">
-        <div class="header-top">
-            <div>
-                <h3 class="fw-bold m-0">Administrator Dashboard</h3>
-                <p class="text-muted small">System activity and resource management</p>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="overview">
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <span class="text-muted small fw-bold text-uppercase">Total Users</span>
+                        <h2 class="fw-bold mt-1 mb-0">@ViewBag.TotalUsers</h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card" style="border-top-color: var(--success);">
+                        <span class="text-muted small fw-bold text-uppercase">Total Facilities</span>
+                        <h2 class="fw-bold mt-1 mb-0">@ViewBag.TotalFacilities</h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card" style="border-top-color: var(--warning);">
+                        <span class="text-muted small fw-bold text-uppercase">Active Tickets</span>
+                        <h2 class="fw-bold mt-1 mb-0">@ViewBag.TotalRequests</h2>
+                    </div>
+                </div>
             </div>
-            <div class="d-flex align-items-center bg-white p-2 rounded-4 border">
-                <img src="https://ui-avatars.com/api/?name=@ViewBag.username&background=4361ee&color=fff" class="rounded-circle me-2" width="40">
-                <div class="me-3">
-                    <p class="m-0 small fw-bold">@ViewBag.username</p>
-                    <span class="badge bg-soft-primary text-primary" style="font-size: 10px;">SUPER ADMIN</span>
+
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <div class="card p-4 shadow-sm border-0">
+                        <h6 class="fw-bold mb-4 border-bottom pb-2">Weekly Ticket Activity</h6>
+                        <div class="chart-wrapper">
+                            <canvas id="requestChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-4 shadow-sm border-0">
+                        <h6 class="fw-bold mb-4 border-bottom pb-2">Resource Mix</h6>
+                        <div class="chart-wrapper">
+                            <canvas id="donutChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="tab-content mt-4">
-            <div class="tab-pane fade show active" id="overview">
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="card stat-card border-start border-primary border-5">
-                            <p class="text-muted small fw-bold mb-1">REGISTERED USERS</p>
-                            <h2 class="fw-bold">@ViewBag.TotalUsers</h2>
-                            <i class="bi bi-people text-primary"></i>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card stat-card border-start border-success border-5">
-                            <p class="text-muted small fw-bold mb-1">TOTAL FACILITIES</p>
-                            <h2 class="fw-bold">@ViewBag.TotalFacilities</h2>
-                            <i class="bi bi-building text-success"></i>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card stat-card border-start border-warning border-5">
-                            <p class="text-muted small fw-bold mb-1">ACTIVE REQUESTS</p>
-                            <h2 class="fw-bold">@ViewBag.TotalRequests</h2>
-                            <i class="bi bi-ticket-perforated text-warning"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mt-2">
-                    <div class="col-md-8">
-                        <div class="card p-4">
-                            <h6 class="fw-bold mb-4">Request Statistics (Weekly)</h6>
-                            <canvas id="requestChart" height="120"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card p-4">
-                            <h6 class="fw-bold mb-4">Resource Distribution</h6>
-                            <canvas id="donutChart" height="250"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="users">
-                <div class="table-container">
-                    <table class="table m-0">
-                        <thead>
+        <div class="tab-pane fade" id="users">
+            <div class="table-container shadow-sm">
+                <table class="table m-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Identity</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th class="text-end pe-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var u in ViewBag.AllUsers)
+                        {
                             <tr>
-                                <th>Identity</th>
-                                <th>Email Address</th>
-                                <th>Role</th>
-                                <th>Status</th>
+                                <td class="ps-4">
+                                    <span class="text-muted me-2 small">#@u.Id</span>
+                                    <span class="fw-bold">@u.Username</span>
+                                </td>
+                                <td class="text-muted small">@u.Email</td>
+                                <td><span class="badge-status bg-light text-dark">@u.Role</span></td>
+                                <td class="text-end pe-4"><span class="text-success small fw-bold">● Active</span></td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var u in ViewBag.AllUsers) {
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-light p-2 rounded me-3">#@u.Id</div>
-                                            <strong>@u.Username</strong>
-                                        </div>
-                                    </td>
-                                    <td>@u.Email</td>
-                                    <td><span class="badge-pill bg-light text-dark border">@u.Role</span></td>
-                                    <td><span class="text-success small fw-bold">● Active</span></td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            <div class="tab-pane fade" id="facilities">
-                @if (TempData["Message"] != null)
+        <div class="tab-pane fade" id="facilities">
+            <div class="row g-3">
+                @foreach (var f in ViewBag.AllFacilities)
                 {
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        @TempData["Message"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <div class="col-md-6">
+                        <div class="card p-3 h-100 shadow-sm border-0">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex">
+                                    <div class="bg-light p-2 rounded-3 me-3 text-primary"><i class="bi bi-building h4"></i></div>
+                                    <div>
+                                        <h6 class="fw-bold m-0">@f.Name</h6>
+                                        <p class="text-muted small m-0 mt-1">@f.Description</p>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-light btn-sm border" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                        <li><button class="dropdown-item py-2" onclick="openEditModal(@f.Id, '@f.Name', '@f.Description')"><i class="bi bi-pencil me-2"></i>Edit</button></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form asp-action="DeleteFacility" method="post" onsubmit="return confirm('Delete this lab?')">
+                                                <input type="hidden" name="id" value="@f.Id" />
+                                                <button type="submit" class="dropdown-item text-danger py-2"><i class="bi bi-trash me-2"></i>Delete</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 }
-
-                <div class="row g-3">
-                    @foreach (var f in ViewBag.AllFacilities)
-                    {
-                        <div class="col-md-6">
-                            <div class="card p-3 shadow-sm border-0 position-relative">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3 text-primary">
-                                        <i class="bi bi-building-fill h4 m-0"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="m-0 fw-bold">@f.Name</h6>
-                                        <p class="text-muted small m-0">@f.Description</p>
-                                    </div>
-
-                                    <div class="dropdown">
-                                        <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown">
-                                            <i class="bi bi-three-dots-vertical fs-5"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                                            <li>
-                                                <button class="dropdown-item" onclick="openEditModal(@f.Id, '@f.Name', '@f.Description')">
-                                                    <i class="bi bi-pencil me-2 text-primary"></i> Edit Lab
-                                                </button>
-                                            </li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li>
-                                                <form asp-action="DeleteFacility" method="post" onsubmit="return confirm('Warning: Deleting this lab might affect associated requests. Proceed?')">
-                                                    <input type="hidden" name="id" value="@f.Id" />
-                                                    <button type="submit" class="dropdown-item text-danger">
-                                                        <i class="bi bi-trash me-2"></i> Delete Lab
-                                                    </button>
-                                                </form>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
             </div>
+        </div>
 
-            <div class="modal fade" id="editFacilityModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow">
-                        <form asp-action="UpdateFacility" method="post">
-                            <div class="modal-header bg-primary text-white border-0 rounded-top">
-                                <h5 class="modal-title fw-bold">Update Lab Details</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body p-4">
-                                <input type="hidden" name="id" id="editId" />
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold small text-uppercase">Facility Name</label>
-                                    <input type="text" name="name" id="editName" class="form-control rounded-3" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold small text-uppercase">Description</label>
-                                    <textarea name="description" id="editDesc" class="form-control rounded-3" rows="3" required></textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer border-0 p-3">
-                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary rounded-pill px-4">Update Lab</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="requests">
-                <div class="table-container">
-                    <table class="table m-0 table-hover">
-                        <thead>
+        <div class="tab-pane fade" id="requests">
+            <div class="table-container shadow-sm">
+                <table class="table m-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Ticket ID</th>
+                            <th>Requestor</th>
+                            <th>Facility</th>
+                            <th>Status</th>
+                            <th>Assignee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in ViewBag.AllRequests)
+                        {
                             <tr>
-                                <th>Ticket</th>
-                                <th>Requestor</th>
-                                <th>Lab</th>
-                                <th>Status</th>
-                                <th>Assigned Assignee</th>
+                                <td class="ps-4"><strong>#REQ-@r.Id</strong><br><small class="text-muted">@r.CreatedAt.ToString("MMM dd")</small></td>
+                                <td class="small">@r.Requestor?.Username</td>
+                                <td><span class="badge-status bg-white text-primary border-primary">@r.Facility?.Name</span></td>
+                                <td><span class="badge-status @(r.Status == "unassigned" ? "bg-warning-subtle text-warning border-warning" : "bg-info-subtle text-info border-info")">@r.Status</span></td>
+                                <td class="small">@(r.Assignee?.Username ?? "Unassigned")</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var r in ViewBag.AllRequests) {
-                                <tr>
-                                    <td><span class="fw-bold">#REQ-@r.Id</span><br><small class="text-muted">@r.CreatedAt.ToString("MMM dd")</small></td>
-                                    <td>@r.Requestor?.Username</td>
-                                    <td><span class="badge-pill bg-light text-primary">@r.Facility?.Name</span></td>
-                                    <td>
-                                        <span class="badge-pill @(r.Status == "unassigned" ? "bg-warning-subtle text-warning border-warning" : "bg-info-subtle text-info border-info") border">
-                                            @r.Status
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <i class="bi bi-person-circle me-2 text-secondary"></i>
-                                            @* Remove space after @ and use parenthesis correctly *@
-                                            @(r.Assignee?.Username ?? "Not Assigned")
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div class="modal fade" id="editFacilityModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form asp-action="UpdateFacility" method="post">
+                <div class="modal-header">
+                    <h6 class="modal-title fw-bold">Edit Lab Details</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="hidden" name="id" id="editId" />
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Lab Name</label>
+                        <input type="text" name="name" id="editName" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Description</label>
+                        <textarea name="description" id="editDesc" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-    <script>
-        // Request Chart (Line)
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Line Chart - Weekly Activity
         const ctx = document.getElementById('requestChart').getContext('2d');
         new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                 datasets: [{
-                    label: 'New Requests',
-                    data: [12, 19, 3, 5, 2, 3, 7],
-                    borderColor: '#4361ee',
-                    tension: 0.4,
+                    label: 'Tickets',
+                    data: [12, 19, 8, 15, 22, 10, 17],
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
                     fill: true,
-                    backgroundColor: 'rgba(67, 97, 238, 0.1)'
+                    tension: 0.4
                 }]
             },
-            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
+            }
         });
 
-        // Donut Chart
+        // Donut Chart - Resource Mix
         const ctx2 = document.getElementById('donutChart').getContext('2d');
         new Chart(ctx2, {
             type: 'doughnut',
@@ -327,22 +319,24 @@
                 labels: ['Users', 'Labs', 'Tickets'],
                 datasets: [{
                     data: [@ViewBag.TotalUsers, @ViewBag.TotalFacilities, @ViewBag.TotalRequests],
-                    backgroundColor: ['#4361ee', '#2ec4b6', '#ff9f1c'],
-                    borderWidth: 0
+                    backgroundColor: ['#2563eb', '#10b981', '#f59e0b'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
                 }]
             },
-            options: { cutout: '70%', plugins: { legend: { position: 'bottom' } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: { legend: { position: 'bottom' } }
+            }
         });
-                function openEditModal(id, name, desc) {
-            // Fill the hidden input and text fields in the modal
-            document.getElementById('editId').value = id;
-            document.getElementById('editName').value = name;
-            document.getElementById('editDesc').value = desc;
+    });
 
-            // Trigger the bootstrap modal
-            var myModal = new bootstrap.Modal(document.getElementById('editFacilityModal'));
-            myModal.show();
-        }
-    </script>
-</body>
-</html>
+    function openEditModal(id, name, desc) {
+        document.getElementById('editId').value = id;
+        document.getElementById('editName').value = name;
+        document.getElementById('editDesc').value = desc;
+        new bootstrap.Modal(document.getElementById('editFacilityModal')).show();
+    }
+</script>
