@@ -152,6 +152,8 @@ namespace LabAssistanteProject.Controllers
                     .OrderByDescending(r => r.CreatedAt)
                     .ToListAsync();
 
+                ViewBag.WIPCount = myRequests.Count(r => r.Status == "Work-In-Progress");
+                ViewBag.CompletedCount = myRequests.Count(r => r.Status == "Completed");
                 ViewBag.MyRequests = myRequests;
             }
 
