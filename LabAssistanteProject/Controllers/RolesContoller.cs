@@ -79,7 +79,7 @@ namespace LabAssistanteProject.Controllers
                 .ToList();
 
             ViewBag.MonthlyAvgTime = completed.Any()
-                ? completed.Average(r => (r.CompletedAt.Value - r.CreatedAt).TotalHours)
+                ? completed.Average(r => (r.CompletedAt!.Value - r.CreatedAt).TotalHours)
                 : 0;
 
 
