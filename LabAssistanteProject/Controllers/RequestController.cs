@@ -3,6 +3,7 @@ using LabAssistanteProject.Data;
 using LabAssistanteProject.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -89,23 +90,25 @@ namespace LabAssistanteProject.Controllers
             TempData["Message"] = "Request deleted successfully.";
             return RedirectToAction("Index", "Home");
         }
-        // GET: /Requests/EditRequest/5
         [HttpGet]
         public async Task<IActionResult> EditRequest(int id)
         {
             var request = await _context.Requests.FindAsync(id);
 
-            // Check if request exists and belongs to the user (optional but recommended)
             if (request == null || request.Status?.ToLower() == "completed")
             {
                 return RedirectToAction("Index", "Home");
             }
 
-            ViewBag.Facilities = await _context.Facilities.ToListAsync();
+            var facilities = await _context.Facilities.ToListAsync();
+            ViewBag.FacilitiesSelectList = new SelectList(facilities, "Id", "Name", request.FacilityId);
 
-            // Explicitly point to the path shown in your screenshot
+            var severities = new List<string> { "Low", "Medium", "High", "Critical" };
+            ViewBag.Severities = new SelectList(severities, request.Severity);
+
             return View("~/Views/Roles/EditRequest.cshtml", request);
         }
+
 
         // POST: /Requests/EditRequest/5
         [HttpPost]
