@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Security.Claims;
 
 namespace LabAssistanteProject.Controllers
@@ -58,6 +59,29 @@ namespace LabAssistanteProject.Controllers
                 .ToListAsync();
 
             ViewBag.Assignees = assignees;
+            var now = DateTime.Now;
+
+            var monthlyRequests = _context.Requests
+                .Where(r => r.CreatedAt.Month == now.Month
+                         && r.CreatedAt.Year == now.Year)
+                .ToList();
+
+            ViewBag.MonthlyTotal = monthlyRequests.Count;
+
+            ViewBag.MonthlyClosed = monthlyRequests
+                .Count(r => r.Status == "Completed");
+
+            ViewBag.MonthlyPending = monthlyRequests
+                .Count(r => r.Status != "Completed");
+
+            var completed = monthlyRequests
+                .Where(r => r.Status == "Completed" && r.CompletedAt != null)
+                .ToList();
+
+            ViewBag.MonthlyAvgTime = completed.Any()
+                ? completed.Average(r => (r.CompletedAt.Value - r.CreatedAt).TotalHours)
+                : 0;
+
 
             return View("~/Views/Roles/FacilityHead.cshtml");
         }
@@ -251,6 +275,23 @@ namespace LabAssistanteProject.Controllers
             }
             return RedirectToAction("Admin");
         }
+        [HttpPost]
+        public IActionResult CompleteRequest(int requestId)
+        {
+            var request = _context.Requests.FirstOrDefault(r => r.Id == requestId);
+            var role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
+
+            if (request == null)
+                return NotFound();
+
+            request.Status = "Completed";
+            request.CompletedAt = DateTime.UtcNow;   // ✅ MAIN LINE
+
+            _context.SaveChanges();
+
+            return RedirectToCorrectDashboard(role);
+        }
+
 
         public IActionResult AccessDenied()
         {

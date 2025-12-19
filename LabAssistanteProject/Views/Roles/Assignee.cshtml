@@ -112,7 +112,7 @@
     <div class="content">
 
         <div class="mb-4">
-            <h3 class="fw-bold m-0">Technician Dashboard</h3>
+            <h3 class="fw-bold m-0">Assingnee Dashboard</h3>
             <p class="text-muted small">
                 Welcome @ViewBag.username — you have
                 <b>@(ViewBag.MyRequests?.Count ?? 0)</b> active tasks
@@ -176,6 +176,8 @@
                             <th>Facility</th>
                             <th>Status</th>
                             <th style="min-width:280px;">Update</th>
+                            <th>Complete</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -218,6 +220,15 @@
                                                 <button class="btn btn-primary btn-sm px-3">Update</button>
                                             </div>
                                         </form>
+                                    </td>
+                                    <td>
+                                        <form asp-action="CompleteRequest" method="post">
+                                            <input type="hidden" name="requestId" value="@r.Id" />
+                                            <button class="btn btn-success btn-sm">
+                                                <i class="bi bi-check-circle me-1"></i> Complete
+                                            </button>
+                                        </form>
+
                                     </td>
                                 </tr>
                                                 }
