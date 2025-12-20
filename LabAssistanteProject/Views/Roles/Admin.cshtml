@@ -131,7 +131,7 @@
                 </div>
                 <div class="col-md-4">
                     <div class="stat-card" style="border-top-color: var(--warning);">
-                        <span class="text-muted small fw-bold text-uppercase">Active Tickets</span>
+                        <span class="text-muted small fw-bold text-uppercase">Active Request</span>
                         <h2 class="fw-bold mt-1 mb-0">@ViewBag.TotalRequests</h2>
                     </div>
                 </div>
@@ -140,7 +140,7 @@
             <div class="row g-4">
                 <div class="col-md-8">
                     <div class="card p-4 shadow-sm border-0">
-                        <h6 class="fw-bold mb-4 border-bottom pb-2">Weekly Ticket Activity</h6>
+                        <h6 class="fw-bold mb-4 border-bottom pb-2">Weekly Request Activity</h6>
                         <div class="chart-wrapper">
                             <canvas id="requestChart"></canvas>
                         </div>
@@ -225,7 +225,7 @@
                 <table class="table m-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">Ticket ID</th>
+                            <th class="ps-4">Request ID</th>
                             <th>Requestor</th>
                             <th>Facility</th>
                             <th>Status</th>
@@ -287,7 +287,7 @@
             data: {
                 labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                 datasets: [{
-                    label: 'Tickets',
+                    label: 'Request',
                     data: [12, 19, 8, 15, 22, 10, 17],
                     borderColor: '#2563eb',
                     backgroundColor: 'rgba(37, 99, 235, 0.1)',
@@ -308,7 +308,7 @@
         new Chart(ctx2, {
             type: 'doughnut',
             data: {
-                labels: ['Users', 'Labs', 'Tickets'],
+                labels: ['Users', 'Labs', 'Requests'],
                 datasets: [{
                     data: [@ViewBag.TotalUsers, @ViewBag.TotalFacilities, @ViewBag.TotalRequests],
                     backgroundColor: ['#2563eb', '#10b981', '#f59e0b'],
