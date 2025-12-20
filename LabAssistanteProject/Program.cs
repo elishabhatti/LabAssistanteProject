@@ -3,13 +3,19 @@ using LabAssistanteProject.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Resend;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ---------------- SERVICES ----------------
-
 // Add MVC
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>(options =>
+{
+    options.ApiToken = "re_j4fBHG8A_Pi2DwTr7WeyU6atomWXH8Nro"; // Use User Secrets or AppSettings for this
+});
+builder.Services.AddTransient<IResend, ResendClient>();
 builder.Services.AddControllersWithViews();
 // Add DbContext
 builder.Services.AddDbContext<MyAppContext>(options =>
