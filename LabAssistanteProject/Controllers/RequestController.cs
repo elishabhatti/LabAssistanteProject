@@ -37,7 +37,7 @@ namespace LabAssistanteProject.Controllers
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Facilities = await _context.Facilities.ToListAsync(); 
+                ViewBag.Facilities = await _context.Facilities.ToListAsync();
                 ViewBag.username = User.Identity?.Name;
                 ViewBag.role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
                 ViewBag.userId = requestorId;

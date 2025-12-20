@@ -18,7 +18,7 @@ namespace LabAssistanteProject.Controllers
         {
             return currentRole switch
             {
-                "admin" => RedirectToAction("Admin","Roles"),
+                "admin" => RedirectToAction("Admin", "Roles"),
                 "facility_head" => RedirectToAction("FacilityHead", "Roles"),
                 "assignee" => RedirectToAction("Assignee", "Roles"),
                 "enduser" => RedirectToAction("EndUser", "Roles"),
@@ -54,14 +54,14 @@ namespace LabAssistanteProject.Controllers
 
             ViewBag.Facilities = await _context.Facilities.ToListAsync();
             ViewBag.Message = TempData["Message"] as string;
-                var userRequests = await _context.Requests
-                    .Where(r => r.RequestorId == requestorId)
-                    .Include(r => r.Facility)
-                    .Include(r => r.Assignee)
-                    .OrderByDescending(r => r.CreatedAt)
-                    .ToListAsync();
+            var userRequests = await _context.Requests
+                .Where(r => r.RequestorId == requestorId)
+                .Include(r => r.Facility)
+                .Include(r => r.Assignee)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
 
-                ViewBag.Requests = userRequests;
+            ViewBag.Requests = userRequests;
 
             return View("~/Views/Home/Index.cshtml");
         }
@@ -75,7 +75,7 @@ namespace LabAssistanteProject.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(); 
+            return View();
         }
     }
 }

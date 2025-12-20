@@ -10,7 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace LabAssistanteProject.Controllers 
+namespace LabAssistanteProject.Controllers
 {
     public class AuthController : Controller
     {
@@ -183,7 +183,7 @@ namespace LabAssistanteProject.Controllers
         }
         //Getting Change Password Page
         [HttpGet]
-        [Authorize] 
+        [Authorize]
         public IActionResult ChangePassword() => View();
 
         // Change Password Post Data

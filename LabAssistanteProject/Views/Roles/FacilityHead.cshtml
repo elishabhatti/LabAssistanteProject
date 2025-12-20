@@ -29,7 +29,6 @@
             margin: 0;
         }
 
-        /* Top Nav */
         .secondary-nav {
             background: white;
             border-bottom: 1px solid var(--border);
@@ -50,7 +49,6 @@
                 color: var(--primary);
             }
 
-        /* Content */
         .content {
             max-width: 1300px;
             margin: auto;
@@ -101,7 +99,6 @@
 </head>
 <body>
 
-    <!-- Top Nav -->
     <div class="secondary-nav">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex gap-2">
@@ -124,7 +121,6 @@
         </div>
     </div>
 
-    <!-- Content -->
     <div class="content">
 
         <div class="mb-4">
@@ -193,12 +189,10 @@
                                 <td>
                                     @if (r.AssigneeId != null && r.Assignee != null)
                                     {
-                                        <!-- Show assigned user's name -->
                                         <span class="fw-semibold">@r.Assignee.Username</span>
                                     }
                                     else
                                     {
-                                        <!-- Show dropdown to assign -->
                                         <form asp-controller="Roles" asp-action="Assign" method="post" class="d-flex gap-2">
                                             <input type="hidden" name="requestId" value="@r.Id" />
                                             <select name="assigneeId" class="form-select form-select-sm" required>
