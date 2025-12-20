@@ -1,6 +1,5 @@
 ﻿using LabAssistanteProject.Data;
 using LabAssistanteProject.Helpers;
-using LabAssistanteProject.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,8 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add MVC
 builder.Services.AddControllersWithViews();
-// --- Register EmailService ---
-builder.Services.AddScoped<EmailService>();
 // Add DbContext
 builder.Services.AddDbContext<MyAppContext>(options =>
     options.UseSqlServer(

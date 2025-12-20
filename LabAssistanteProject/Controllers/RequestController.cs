@@ -1,7 +1,5 @@
-﻿// LabAssistanteProject.Controllers/RequestsController.cs
-using LabAssistanteProject.Data;
+﻿using LabAssistanteProject.Data;
 using LabAssistanteProject.Models;
-using LabAssistanteProject.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,14 +12,14 @@ namespace LabAssistanteProject.Controllers
     public class RequestsController : Controller
     {
         private readonly MyAppContext _context;
-        private readonly EmailService _emailService;
-        // Constructor
-        public RequestsController(MyAppContext context, EmailService emailService)
+
+        public RequestsController(
+            MyAppContext context)
         {
             _context = context;
-            _emailService = emailService;
         }
-        // Post Reqquest
+
+        // Post Request With Email Notification to the facility head
         [HttpPost]
         public async Task<IActionResult> Create(Requests request)
         {
@@ -39,8 +37,10 @@ namespace LabAssistanteProject.Controllers
             {
                 ViewBag.Facilities = await _context.Facilities.ToListAsync();
                 ViewBag.username = User.Identity?.Name;
-                ViewBag.role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirstValue("Role");
+                ViewBag.role = User.FindFirstValue(ClaimTypes.Role)
+                                ?? User.FindFirstValue("Role");
                 ViewBag.userId = requestorId;
+
                 return View("~/Views/Roles/EndUser.cshtml", request);
             }
 
@@ -48,41 +48,21 @@ namespace LabAssistanteProject.Controllers
             {
                 _context.Requests.Add(request);
                 await _context.SaveChangesAsync();
-
-                // --- Send Email Notification ---
-                var facilityHead = await _context.Users
-                                    .FirstOrDefaultAsync(u => u.Role == "facility_head");
-                if (facilityHead != null)
-                {
-                    string subject = "New Service Request Submitted";
-                    string body = $"Hello {facilityHead.Username},<br>" +
-                                  $"A new request has been submitted by {User.Identity?.Name} " +
-                                  $"for {request.FacilityId} (Facility ID).<br>" +
-                                  $"Please check your dashboard to assign it.";
-
-                    // assuming you injected EmailService
-                    _emailService.SendEmail(facilityHead.Email, subject, body);
-                }
-
-                TempData["Message"] = $"Service Request submitted successfully!";
             }
             catch (Exception ex)
             {
                 string errorMessage = "An error occurred while saving the request.";
-                if (ex.InnerException != null)
-                {
-                    errorMessage += " Details: " + ex.InnerException.Message;
-                }
-                else
-                {
-                    errorMessage += " Details: " + ex.Message;
-                }
+                errorMessage += ex.InnerException != null
+                    ? " Details: " + ex.InnerException.Message
+                    : " Details: " + ex.Message;
+
                 TempData["Message"] = errorMessage;
                 return RedirectToAction("Index", "Home");
             }
 
             return RedirectToAction("Index", "Home");
         }
+
         // Delete Request
         [HttpPost]
         [ValidateAntiForgeryToken]
