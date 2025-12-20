@@ -1,5 +1,6 @@
 ﻿namespace LabAssistanteProject.Models
 {
+    // Facilities Model
     public class Facilities
     {
         public int Id { get; set; }

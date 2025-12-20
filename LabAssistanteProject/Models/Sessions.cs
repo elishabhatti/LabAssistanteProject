@@ -1,5 +1,6 @@
 ﻿namespace LabAssistanteProject.Models
 {
+    // Sessions Model
     public class Sessions
     {
         public int id { get; set; }

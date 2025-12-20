@@ -5,22 +5,21 @@ namespace LabAssistanteProject.Data
 {
     public class MyAppContext : DbContext
     {
+        // Constructor
         public MyAppContext(DbContextOptions<MyAppContext> options)
             : base(options)
         { }
+        public DbSet<Users> Users { get; set; } // Users Table
+        public DbSet<Facilities> Facilities { get; set; } // Facilities Table
+        public DbSet<Requests> Requests { get; set; } // Requests Table
+        public DbSet<Sessions> Sessions { get; set; } // Sessions Table
+        public DbSet<History> History { get; set; } // History Table
 
-        public DbSet<Users> Users { get; set; }
-        public DbSet<Facilities> Facilities { get; set; }
-        public DbSet<Requests> Requests { get; set; }
-        public DbSet<Sessions> Sessions { get; set; }
-        public DbSet<History> History { get; set; }
-
-        // 👇 THIS IS THE FIX
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // History → Requests (CASCADE OK)
+            // History → Requests (CASCADE)
             modelBuilder.Entity<History>()
                 .HasOne(h => h.Request)
                 .WithMany(r => r.StatusHistories)

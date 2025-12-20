@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LabAssistanteProject.Models
 {
+    // History Model
     public class History
     {
         [Key]
         public int Id { get; set; }
 
-        // FK → Requests
         [Required]
         public int RequestId { get; set; }
 
@@ -21,7 +21,6 @@ namespace LabAssistanteProject.Models
         [Required]
         public string NewStatus { get; set; } = string.Empty;
 
-        // jis user ne status change kiya
         [Required]
         public int UpdatedBy { get; set; }
 

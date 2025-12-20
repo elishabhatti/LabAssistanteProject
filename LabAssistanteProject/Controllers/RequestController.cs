@@ -15,13 +15,13 @@ namespace LabAssistanteProject.Controllers
     {
         private readonly MyAppContext _context;
         private readonly EmailService _emailService;
-
+        // Constructor
         public RequestsController(MyAppContext context, EmailService emailService)
         {
             _context = context;
             _emailService = emailService;
         }
-
+        // Post Reqquest
         [HttpPost]
         public async Task<IActionResult> Create(Requests request)
         {
@@ -83,7 +83,7 @@ namespace LabAssistanteProject.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-        // POST: Requests/Delete/5
+        // Delete Request
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -109,6 +109,7 @@ namespace LabAssistanteProject.Controllers
             TempData["Message"] = "Request deleted successfully.";
             return RedirectToAction("Index", "Home");
         }
+        // Edit Request Page
         [HttpGet]
         public async Task<IActionResult> EditRequest(int id)
         {
@@ -129,7 +130,7 @@ namespace LabAssistanteProject.Controllers
         }
 
 
-        // POST: /Requests/EditRequest/5
+        // POST Edit Request
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditRequest(int id, [Bind("Id,FacilityId,Severity,Description")] Requests updatedReq)

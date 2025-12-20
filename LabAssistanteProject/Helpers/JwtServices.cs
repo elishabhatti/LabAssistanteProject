@@ -6,16 +6,15 @@ using System.Text;
 
 namespace LabAssistanteProject.Helpers
 {
-
     public class JwtService
     {
         private readonly IConfiguration _config;
-
+        // Constructor
         public JwtService(IConfiguration config)
         {
             _config = config;
         }
-
+        // Generate JWT Token
         public string GenerateToken(Users user)
         {
             var claims = new[]

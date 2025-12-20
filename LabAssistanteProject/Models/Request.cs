@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 namespace LabAssistanteProject.Models
 {
-public class Requests
-{
+    // Request Model
+    public class Requests
+    {
     [Key]
     public int Id { get; set; }
 

@@ -8,12 +8,12 @@ using System.Security.Claims;
 
 namespace LabAssistanteProject.Controllers
 {
-    // Ensure all authenticated users are handled here, or redirect to Login
     [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly MyAppContext _context;
+        // Role-Based Redirection
         private IActionResult RedirectToCorrectDashboard(string? currentRole)
         {
             return currentRole switch
@@ -25,12 +25,13 @@ namespace LabAssistanteProject.Controllers
                 _ => RedirectToAction("Login", "Auth")
             };
         }
+        // Constructor
         public HomeController(ILogger<HomeController> logger, MyAppContext context)
         {
             _logger = logger;
             _context = context;
         }
-
+        // Getting Home Page
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -65,12 +66,12 @@ namespace LabAssistanteProject.Controllers
             return View("~/Views/Home/Index.cshtml");
         }
 
-
+        // Getting Privacy Page
         public IActionResult Privacy()
         {
             return View();
         }
-
+        // Getting Error Page
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

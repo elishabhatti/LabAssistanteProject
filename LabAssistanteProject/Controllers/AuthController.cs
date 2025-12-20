@@ -10,7 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
+namespace LabAssistanteProject.Controllers 
 {
     public class AuthController : Controller
     {
@@ -23,17 +23,18 @@ namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
             _jwtService = jwtService;
         }
 
-        // --- Role-Based Redirection Helper ---
+        // Role-Based Redirection
         private IActionResult RedirectToRolePage(Users user)
         {
-            // Database mein roles "Admin", "FacilityHead", etc hain, switch case handle kar lega
+            //getting the role 
             var role = user.Role?.ToLowerInvariant() ?? "enduser";
 
+            //based on the role redirecting to the respective dashboard
             return role switch
             {
                 "admin" => RedirectToAction("Admin", "Roles"),
                 "facilityhead" => RedirectToAction("FacilityHead", "Roles"),
-                "facility_head" => RedirectToAction("FacilityHead", "Roles"), // Handle both naming styles
+                "facility_head" => RedirectToAction("FacilityHead", "Roles"),
                 "assignee" => RedirectToAction("Assignee", "Roles"),
                 "technician" => RedirectToAction("Assignee", "Roles"),
                 "enduser" => RedirectToAction("EndUser", "Roles"),
@@ -41,10 +42,11 @@ namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
             };
         }
 
-        // ------------------ REGISTER ------------------
+        //Getting Register Page
         [HttpGet]
         public IActionResult Register() => View();
 
+        //Posting Register Data
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(Users user)
@@ -77,8 +79,7 @@ namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
 
             return RedirectToRolePage(user);
         }
-
-        // ------------------ LOGIN ------------------
+        //Getting Login Page
         [HttpGet]
         public IActionResult Login() => View();
 
@@ -117,7 +118,7 @@ namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
             // 5. ✅ Updated: Redirect to Role-specific Dashboard
             return RedirectToRolePage(user);
         }
-        // --- Admin Registration GET ---
+        //Getting Admin Register Page
         [HttpGet]
         public IActionResult AdminRegister()
         {
@@ -125,7 +126,6 @@ namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
         }
 
         // --- Admin Registration POST ---
-        // --- Admin Registration POST (Updated with Hashing, Session, and Cookies) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AdminRegister(Users user, string SecretKey)
@@ -181,12 +181,12 @@ namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
 
             return View(user);
         }
-        // GET: /Auth/ChangePassword
+        //Getting Change Password Page
         [HttpGet]
-        [Authorize] // Sirf logged in user access kar sake
+        [Authorize] 
         public IActionResult ChangePassword() => View();
 
-        // POST: /Auth/ChangePassword
+        // Change Password Post Data
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
@@ -223,7 +223,7 @@ namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
             return RedirectToRolePage(user);
         }
 
-        // ------------------ LOGOUT ------------------
+        //Logout Route
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Logout()
@@ -232,7 +232,7 @@ namespace LabAssistanteProject.Controllers // Namespace sahi kar diya
             return RedirectToAction("Login");
         }
 
-        // --- Helper: Cookie Append ---
+        // Helper Cookie Append
         private void AppendJwtCookie(string token, DateTime expiry)
         {
             Response.Cookies.Append("jwt", token, new CookieOptions

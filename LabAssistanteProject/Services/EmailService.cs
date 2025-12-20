@@ -4,15 +4,17 @@ using Microsoft.Extensions.Configuration;
 
 namespace LabAssistanteProject.Services
 {
+    // Email Service
     public class EmailService
     {
         private readonly IConfiguration _config;
 
+        // Constructor
         public EmailService(IConfiguration config)
         {
             _config = config;
         }
-
+        // Send Email Method
         public void SendEmail(string? toEmail, string subject, string body)
         {
             if (string.IsNullOrEmpty(toEmail))
@@ -52,7 +54,6 @@ namespace LabAssistanteProject.Services
                 }
                 catch (Exception ex)
                 {
-                    // Optional: log error
                     Console.WriteLine("Email sending failed: " + ex.Message);
                 }
             }

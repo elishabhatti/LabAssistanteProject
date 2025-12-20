@@ -11,13 +11,12 @@ namespace LabAssistanteProject.Controllers
     public class RolesController : Controller
     {
         private readonly MyAppContext _context;
-
+        // Constructor
         public RolesController(MyAppContext context)
         {
             _context = context;
         }
-
-        // --- Helper: Redirect Logic ---
+        // Role-Based Redirection
         private IActionResult RedirectToCorrectDashboard(string? currentRole)
         {
             return currentRole switch
@@ -29,8 +28,7 @@ namespace LabAssistanteProject.Controllers
                 _ => RedirectToAction("Login", "Auth")
             };
         }
-
-        // --- Facility Head Dashboard ---
+        // Facility Head Dashboard
         [HttpGet]
         public async Task<IActionResult> FacilityHead()
         {
@@ -85,7 +83,7 @@ namespace LabAssistanteProject.Controllers
 
             return View("~/Views/Roles/FacilityHead.cshtml");
         }
-
+        // Assign Request to Assignee
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Assign(int requestId, int assigneeId)
@@ -130,8 +128,7 @@ namespace LabAssistanteProject.Controllers
 
             return RedirectToAction("FacilityHead");
         }
-
-        // --- Admin Dashboard ---
+        // Admin Dashboard
         public async Task<IActionResult> Admin()
         {
             // Role Check
@@ -154,8 +151,7 @@ namespace LabAssistanteProject.Controllers
 
             return View("~/Views/Roles/Admin.cshtml");
         }
-
-        // --- Assignee/Technician Dashboard ---
+        // Assignee Dashboard
         public async Task<IActionResult> Assignee()
         {
             // Role Check
@@ -183,7 +179,7 @@ namespace LabAssistanteProject.Controllers
 
             return View("~/Views/Roles/Assignee.cshtml");
         }
-
+        // Update Request Status and Remarks
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int requestId, string newStatus, string remarks)
@@ -225,8 +221,7 @@ namespace LabAssistanteProject.Controllers
 
             return RedirectToAction("Assignee");
         }
-
-        // --- EndUser Dashboard ---
+        // End User Dashboard
         public async Task<IActionResult> EndUser()
         {
             // Role Check
@@ -243,8 +238,7 @@ namespace LabAssistanteProject.Controllers
 
             return View("~/Views/Roles/EndUser.cshtml");
         }
-        // --- Facility Management (Admin Only) ---
-
+        // Create Facility
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateFacility(int id, string name, string description)
@@ -261,7 +255,7 @@ namespace LabAssistanteProject.Controllers
             TempData["Message"] = "Facility updated successfully!";
             return RedirectToAction("Admin");
         }
-
+        // Delete Facility
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteFacility(int id)
@@ -275,6 +269,7 @@ namespace LabAssistanteProject.Controllers
             }
             return RedirectToAction("Admin");
         }
+        // Complete Request
         [HttpPost]
         public IActionResult CompleteRequest(int requestId)
         {
@@ -292,7 +287,7 @@ namespace LabAssistanteProject.Controllers
             return RedirectToCorrectDashboard(role);
         }
 
-
+        // Access Denied Page
         public IActionResult AccessDenied()
         {
             return View();
