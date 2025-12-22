@@ -174,8 +174,6 @@
                             <th>Facility</th>
                             <th>Status</th>
                             <th style="min-width:280px;">Update</th>
-                            <th>Complete</th>
-
                         </tr>
                     </thead>
                     <tbody>
@@ -202,24 +200,35 @@
                                 </span>
                             </td>
                             <td>
-                                <textarea class="form-control form-control-sm mb-2" rows="1" placeholder="Add remarks">@r.Remarks</textarea>
-                                <div class="d-flex gap-2">
-                                    <select class="form-select form-select-sm w-50">
-                                        <option selected="@(@r.Status == "Work-In-Progress")">Work-In-Progress</option>
-                                        <option selected="@(@r.Status == "Completed")">Completed</option>
-                                        <option selected="@(@r.Status == "On-Hold")">On-Hold</option>
-                                    </select>
-                                    <button class="btn btn-primary btn-sm px-3">Update</button>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                <form asp-action="CompleteRequest" method="post" class="m-0">
-                                    <input type="hidden" name="requestId" value="@r.Id" />
-                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">
-                                        <i class="bi bi-check-circle me-1"></i> Complete
-                                    </button>
-                                </form>
-                            </td>
+                                <form asp-action="UpdateStatus" method="post">
+                                    @Html.AntiForgeryToken()
+
+                                            <input type="hidden" name="requestId" value="@r.Id" />
+
+                                            <textarea name="remarks"
+                                              class="form-control form-control-sm mb-2"
+                                              rows="2">@r.Remarks</textarea>
+
+                                            <div class="d-flex gap-2">
+                                                <select name="newStatus" class="form-select form-select-sm w-50">
+                                                    <option value="Work-In-Progress" selected="@(r.Status == "Work-In-Progress")">
+                                                        Work-In-Progress
+                                                    </option>
+                                                    <option value="Completed" selected="@(r.Status == "Completed")">
+                                                        Completed
+                                                    </option>
+                                                    <option value="On-Hold" selected="@(r.Status == "On-Hold")">
+                                                        On-Hold
+                                                    </option>
+                                                </select>
+
+                                                <button type="submit" class="btn btn-primary btn-sm px-3">
+                                                    Update
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </td>
+
                         </tr>
                                                 }
                         }
