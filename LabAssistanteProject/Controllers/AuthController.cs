@@ -132,7 +132,7 @@ namespace LabAssistanteProject.Controllers
         {
             const string SYSTEM_SECRET = "LabAdmin@2025";
 
-            // 1. Secret Key Check
+            // 1. Secret Key Check`
             if (SecretKey != SYSTEM_SECRET)
             {
                 TempData["Error"] = "Invalid Secret Key! Authorization Denied.";
